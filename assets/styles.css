@@ -63,10 +63,11 @@ button,a{-webkit-tap-highlight-color:transparent}
 .site-header{position:sticky;top:0;z-index:70;padding:12px 0;transition:padding .4s var(--ease)}
 .site-header .bar{display:flex;align-items:center;gap:18px;padding:8px 10px 8px 14px;border:1px solid var(--line);border-radius:999px;background:color-mix(in srgb,var(--surface-solid) 72%,transparent);backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);box-shadow:0 10px 40px -20px rgba(0,0,0,.25)}
 .brand{display:flex;align-items:center;gap:10px;flex-shrink:0;perspective:400px}
-.brand .mark{width:30px;height:62px;margin:-14px 0}
+.brand .mark{width:22px;height:46px;flex-shrink:0}
+.mark.still .flame{animation:none;filter:drop-shadow(0 0 3px rgba(245,190,70,.8))}
 .brand-words{display:flex;flex-direction:column;line-height:1}
-.brand-words strong{font:700 19px/1 var(--font-display);letter-spacing:.01em}
-.brand-words small{font:800 9.5px/1 var(--font-ui);letter-spacing:.32em;color:var(--gold);margin-top:5px}
+.brand-words strong{display:flex;flex-direction:column;font:800 13px/1.15 var(--font-ui);letter-spacing:.055em;text-transform:uppercase}
+.brand-words small{font:800 8.5px/1 var(--font-ui);letter-spacing:.24em;color:var(--gold);margin-top:4px}
 .primary-nav{display:flex;gap:2px;margin-left:auto}
 .primary-nav a{position:relative;padding:9px 13px;border-radius:999px;font:700 13px/1 var(--font-ui);color:var(--muted);transition:color .25s,background .25s}
 .primary-nav a:hover{color:var(--ink);background:var(--surface2)}
@@ -122,8 +123,6 @@ body.locked{overflow:hidden}
 @keyframes spin{0%,78%{transform:rotateY(0)}92%,100%{transform:rotateY(360deg)}}
 @keyframes flicker{0%,100%{transform:scale(1,1) skewX(0)}22%{transform:scale(.97,1.04) skewX(-1.5deg)}45%{transform:scale(1.02,.97) skewX(1.2deg)}68%{transform:scale(.98,1.05) skewX(-.6deg)}84%{transform:scale(1.01,.98) skewX(.8deg)}}
 @keyframes halo{0%,100%{opacity:.55;transform:scale(1)}50%{opacity:.9;transform:scale(1.12)}}
-.brand .mark-float{animation-duration:5s}
-.brand .mark .flame{filter:drop-shadow(0 0 3px rgba(245,190,70,.9))}
 
 /* ---------- type ---------- */
 h1,h2,h3,h4{font-family:var(--font-display);font-weight:600;line-height:1.02;letter-spacing:-.012em;margin:0;text-wrap:balance}
@@ -172,7 +171,9 @@ p{margin:0 0 1em;text-wrap:pretty}
 /* ---------- home hero ---------- */
 .hero{position:relative;min-height:min(92vh,900px);display:flex;align-items:center;padding:40px 0 120px;overflow:hidden}
 .hero-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:40px;align-items:center;position:relative;z-index:2}
-.hero h1{margin-bottom:22px}
+.hero h1{margin-bottom:22px;line-height:.95}
+.hero h1 .h1-pre{display:block;font-size:.42em;font-weight:500;letter-spacing:.01em;color:var(--muted);margin-bottom:.15em}
+.hero h1 em{display:inline-block;padding-right:.08em}
 .hero .tagline{font:600 italic clamp(22px,2.6vw,30px)/1.2 var(--font-display);color:var(--gold);margin-bottom:18px}
 .hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
 .hero-mark{position:relative;display:flex;justify-content:center;align-items:center;perspective:900px}
@@ -208,7 +209,7 @@ p{margin:0 0 1em;text-wrap:pretty}
 .today-inner{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.4fr) minmax(0,.9fr);gap:0;overflow:hidden}
 .today-cell{padding:26px 28px;border-right:1px solid var(--line)}
 .today-cell:last-child{border-right:0}
-.today-label{font:800 10.5px var(--font-ui);letter-spacing:.2em;text-transform:uppercase;color:var(--gold);display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.today-label{font:800 10.5px/1.5 var(--font-ui);letter-spacing:.2em;text-transform:uppercase;color:var(--gold);display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;margin-bottom:10px}
 .live-dot{width:8px;height:8px;border-radius:50%;background:#3ccf8e;box-shadow:0 0 0 0 rgba(60,207,142,.6);animation:pulse 2s infinite}
 @keyframes pulse{70%{box-shadow:0 0 0 10px rgba(60,207,142,0)}100%{box-shadow:0 0 0 0 rgba(60,207,142,0)}}
 .hdate{font:600 30px/1.05 var(--font-display)}
@@ -325,7 +326,8 @@ p{margin:0 0 1em;text-wrap:pretty}
 .page-hero{padding:clamp(56px,9vw,120px) 0 clamp(40px,6vw,70px);position:relative}
 .page-hero h1{font-size:clamp(44px,7vw,92px);max-width:13ch}
 .page-hero .lead{margin-top:22px}
-.crumbs{display:flex;flex-wrap:wrap;gap:8px;font:700 12px var(--font-ui);color:var(--faint);margin-bottom:26px}
+.crumbs{display:flex;flex-wrap:wrap;gap:8px;font:800 11.5px/1.6 var(--font-ui);letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin-bottom:22px}
+.crumbs [aria-current]{color:var(--gold)}
 .crumbs a:hover{color:var(--gold)}
 .crumbs span::before{content:'/';margin-right:8px;opacity:.6}
 .on-page{display:flex;flex-wrap:wrap;gap:8px;margin-top:30px}
@@ -403,8 +405,8 @@ ul.clean{list-style:none;padding:0;margin:0}
 .footer-grid{display:grid;grid-template-columns:1.4fr repeat(3,1fr);gap:40px}
 .footer-brand{display:flex;gap:16px;align-items:flex-start}
 .footer-brand .mark{width:44px;height:auto}
-.footer-brand strong{display:block;font:700 26px/1 var(--font-display)}
-.footer-brand small{display:block;font:800 10px var(--font-ui);letter-spacing:.28em;color:var(--gold);margin:6px 0 14px}
+.footer-brand .brand-words strong{font-size:16px}
+.footer-brand .brand-words small{font-size:10px;margin:6px 0 14px}
 .footer p{color:var(--muted);font-size:14px;max-width:360px}
 .footer h4{font:800 11px var(--font-ui);letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:16px}
 .footer-col a{display:block;padding:5px 0;color:var(--muted);font-size:14.5px;transition:color .2s,transform .3s var(--ease)}
@@ -455,13 +457,12 @@ ul.clean{list-style:none;padding:0;margin:0}
   .container{width:calc(100% - 32px)}
   .site-header{padding:12px 0 8px}
   .site-header .bar{gap:8px;padding:6px 6px 6px 12px}
-  .brand-words strong{font-size:17px}
+  .brand-words strong{font-size:12px}
   .horizon-label{display:none}
   .header-actions .join{display:none}
   .g4,.links-band,.teach-grid{grid-template-columns:minmax(0,1fr)}
   .player-title{white-space:normal}
   .hero-mark .halo-rays{width:80vw}.hero-mark .orbit-ring{width:64vw}.hero-mark .orbit-ring.two{width:74vw}.hero-mark::before{width:80vw}
-  .brand .mark{margin:-8px 0}
   .letters,.books{grid-template-columns:1fr 1fr}
   .letter-card{min-height:auto}
   .letter-card .heb{font-size:62px}

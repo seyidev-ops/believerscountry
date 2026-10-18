@@ -86,8 +86,11 @@ DEFS = '''<svg width="0" height="0" style="position:absolute" aria-hidden="true"
 <linearGradient id="cityGlow" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe7a6" stop-opacity=".95"/><stop offset=".5" stop-color="#e8c46f" stop-opacity=".55"/><stop offset="1" stop-color="#7cd8dc" stop-opacity=".1"/></linearGradient>
 </defs></svg>'''
 
-def mark(cls='', label=None):
+def mark(cls='', label=None, still=False):
     aria = f'role="img" aria-label="{e(label)}"' if label else 'aria-hidden="true"'
+    if still:
+        return (f'<svg class="mark still {cls}" viewBox="{LOGO["viewBox"]}" {aria} focusable="false">'
+                f'<path class="ring" d="{LOGO["ring"]}"/><path class="body" d="{LOGO["body"]}"/><path class="flame" d="{LOGO["flame"]}"/></svg>')
     return (f'<span class="mark-float {cls}"><span class="mark-spin"><svg class="mark" viewBox="{LOGO["viewBox"]}" {aria} focusable="false">'
             f'<ellipse class="flame-halo" cx="768" cy="430" rx="190" ry="250" fill="url(#flameHalo)"/>'
             f'<path class="ring" d="{LOGO["ring"]}"/><path class="body" d="{LOGO["body"]}"/><path class="flame" d="{LOGO["flame"]}"/>'
@@ -109,7 +112,7 @@ def header(r, section):
     dlinks = ''.join(f'<a href="{r}{h}">{t if t != "5787" else "The Year 5787"} <small>{sub}</small></a>' for (h, t, k), sub in zip(NAV, ['Who we are', 'Four streams', 'Weekly', 'Podcast', 'Shabbat library', 'Books', 'This year']))
     return f'''<a class="skip" href="#main">Skip to content</a>
 <header class="site-header"><div class="container"><div class="bar">
-<a class="brand" href="{r or './'}" aria-label="Believers Country — home">{mark()}<span class="brand-words"><strong>Believers Country</strong><small>CMI</small></span></a>
+<a class="brand" href="{r or './'}" aria-label="Believers Country — home">{mark(still=True)}<span class="brand-words"><strong><span>Believers</span><span>Country</span></strong><small>CMI</small></span></a>
 <nav class="primary-nav" aria-label="Main">{links}</nav>
 <div class="header-actions">{toggle()}<a class="button gold join" href="{r}encounters/">Join us {I['arrow']}</a>
 <button class="menu-button" id="menu-button" type="button" aria-expanded="false" aria-controls="drawer" aria-label="Open menu"><i></i><i></i></button></div>
@@ -120,7 +123,7 @@ def header(r, section):
 def footer(r):
     return f'''<footer class="footer"><div class="container">
 <div class="footer-grid">
-<div><a class="footer-brand" href="{r or './'}">{mark()}<span><strong>Believers Country</strong><small>COUNTRY MINISTRIES INTERNATIONAL</small></span></a>
+<div><a class="footer-brand" href="{r or './'}">{mark()}<span class="brand-words"><strong><span>Believers</span><span>Country</span></strong><small>CMI</small></span></a>
 <p>A people belonging to the Father. A life received in the Son. A country expressed through His Spirit.</p>
 <div class="socials"><a href="{LINKS['youtube']}" target="_blank" rel="noopener" aria-label="Believers Country on YouTube">{I['youtube']}</a><a href="{LINKS['shabbat']}" target="_blank" rel="noopener" aria-label="Join the Shabbat Service WhatsApp group">{I['whatsapp']}</a><a href="{r}contact/" aria-label="Contact Believers Country">{I['mail']}</a></div></div>
 <div class="footer-col"><h4>Discover</h4><a href="{r}about/">Who we are</a><a href="{r}ministries/">Four ministry streams</a><a href="{r}year-5787/">The Year 5787</a><a href="{r}contact/">Contact</a></div>
@@ -185,12 +188,18 @@ def crumbs(r, trail):
     items = f'<a href="{r or "./"}">Home</a>' + ''.join(f'<span><a href="{r}{h}">{t}</a></span>' if h else f'<span aria-current="page">{t}</span>' for h, t in trail)
     return f'<nav class="crumbs" aria-label="Breadcrumb">{items}</nav>'
 
+# Breadcrumb names for parent pages — the same label each page carries as its own crumb.
+CRUMB = {'ministries/': 'CMI ministry expressions', 'encounters/': 'Weekly encounters', 'listen/2-minutes/': 'The listening room',
+         'teachings/': 'Shabbat teachings', 'spiritual-intent/': 'Spiritual Intent'}
+
 def page_hero(r, trail, eyebrow, h1, lead, chips=None, side=True):
+    # The page's label lives in the breadcrumb (Home / Weekly encounters), not repeated as a dashed line above the title.
+    trail = [(h, CRUMB.get(h, t)) for h, t in trail[:-1]] + [(None, eyebrow)]
     c = ''
     if chips:
         c = '<div class="on-page">' + ''.join(f'<a class="chip" href="{h}">{t}</a>' for h, t in chips) + '</div>'
     sm = f'<div class="side-mark" aria-hidden="true">{mark()}</div>' if side else ''
-    return f'''<section class="page-hero"><div class="container reveal">{crumbs(r, trail)}<div class="eyebrow">{eyebrow}</div><h1>{h1}</h1><p class="lead">{lead}</p>{c}</div>{sm}</section>'''
+    return f'''<section class="page-hero"><div class="container reveal">{crumbs(r, trail)}<h1>{h1}</h1><p class="lead">{lead}</p>{c}</div>{sm}</section>'''
 
 def share_box(title, url):
     return (f'<div class="share" data-share-title="{e(title)}" data-share-url="{url}"><button class="chip" type="button" data-share-toggle aria-expanded="false">{I["share"]} Share</button>'
@@ -316,8 +325,8 @@ def home(r):
     return f'''
 <section class="hero"><div class="clouds" aria-hidden="true"><span class="cloud"></span><span class="cloud"></span><span class="cloud"></span></div>
 <div class="container hero-grid">
-<div class="reveal"><div class="eyebrow">Country Ministries International</div>
-<h1>Welcome to <em>Believers</em> Country.</h1>
+<div class="reveal">
+<h1><span class="h1-pre">Welcome to</span><em>Believers</em><br>Country.</h1>
 <div class="tagline">Living Eternal Life Abundantly.</div>
 <p class="lead">A people belonging to the Father. A life received in the Son. A country expressed through His Spirit.</p>
 <div class="hero-actions"><a class="button primary" href="{r}encounters/">Join a weekly encounter {I['arrow']}</a><a class="button ghost" href="#today">{I['headphones']} Today’s 2 minutes</a></div>
@@ -508,7 +517,7 @@ def teachings(r):
     cards = ''.join(svc_card(r, s, s['n'] == feat) for s in SERVICES)
     arc = [('1–3', 'Who the Son is', 'Before all things, made flesh, declared by the Father.'), ('4–7', 'His life among us', 'Testing, teaching, service and shepherding.'),
            ('8–9', 'Cross and empty tomb', 'The Lamb slain, the firstborn from the dead.'), ('10–12', 'His present ministry', 'Enthroned, interceding, joined to His body.'), ('13', 'His appearing', 'Closing the quarter in expectation.')]
-    return page_hero(r, [(None, 'Teachings')], 'Shabbat services · First quarter of 5787 · The Tav movement', 'Celebrating <em>the Son.</em>',
+    return page_hero(r, [(None, 'Teachings')], 'Shabbat teachings · First quarter of 5787', 'Celebrating <em>the Son.</em>',
                      'Thirteen Sabbaths moving in a single arc through the person and work of Christ Jesus. The quarter stands under the Tav — the sign, the seal and the mark of ownership — and its one question is whose you are. Every service answers it in the Son.') + f'''
 <section class="section tight" style="padding-top:0"><div class="container"><div class="movement-bar reveal" style="grid-template-columns:repeat(5,1fr)">{''.join(f'<div>Shabbat {a}<small>{b} — {c}</small></div>' for a, b, c in arc)}</div></div></section>
 <section class="section tight"><div class="container">
@@ -628,7 +637,7 @@ def legal(kind):
             title, h1, lead = 'Terms of Use', 'Terms of <em>Use.</em>', 'The simple terms for using the Believers Country website and its content.'
         s = ''.join(f'<h2 style="font-size:clamp(26px,3vw,34px);margin:40px 0 12px">{a}</h2><p>{b}</p>' for a, b in secs)
         other = ('terms/', 'Terms of Use') if kind == 'privacy' else ('privacy/', 'Privacy Policy')
-        return page_hero(r, [(None, title)], 'Site information', h1, lead, side=False) + f'''
+        return page_hero(r, [(None, title)], title, h1, lead, side=False) + f'''
 <section class="section tight" style="padding-top:0"><div class="container article"><div class="prose reveal">{s}<p class="muted small" style="margin-top:40px">Last updated {NOW.strftime('%-d %B %Y')}.</p></div>
 <aside class="aside reveal"><div class="panel"><div class="kicker">Also read</div><p style="margin:10px 0 0"><a class="textlink" href="{r}{other[0]}">{other[1]} <span class="arr">→</span></a></p></div></aside></div></section>'''
     title = 'Privacy Policy' if kind == 'privacy' else 'Terms of Use'
@@ -658,7 +667,7 @@ def main():
     sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + ''.join(f'<url><loc>{SITE_URL}{p}</loc></url>' for p in PAGES) + '</urlset>\n'
     (ROOT / 'sitemap.xml').write_text(sitemap)
     (ROOT / 'robots.txt').write_text(f'User-agent: *\nAllow: /\nSitemap: {SITE_URL}sitemap.xml\n')
-    page('', 'Page not found', 'This page could not be found.', lambda r: page_hero(r, [(None, 'Not found')], '404', 'This path has <em>no road yet.</em>', 'The page you were looking for has moved or does not exist. Start again from home, or step into one of the gatherings.') + next_steps(r, [('', 'Home', 'Return to the beginning.'), ('encounters/', 'Weekly encounters', 'Join us this week.'), ('listen/2-minutes/', 'Listen', 'Today’s 2 minutes.')]), extra_head='<base href="/cmi/"><meta name="robots" content="noindex">', out_file='404.html')
+    page('', 'Page not found', 'This page could not be found.', lambda r: page_hero(r, [(None, 'Not found')], 'Page not found', 'This path has <em>no road yet.</em>', 'The page you were looking for has moved or does not exist. Start again from home, or step into one of the gatherings.') + next_steps(r, [('', 'Home', 'Return to the beginning.'), ('encounters/', 'Weekly encounters', 'Join us this week.'), ('listen/2-minutes/', 'Listen', 'Today’s 2 minutes.')]), extra_head='<base href="/cmi/"><meta name="robots" content="noindex">', out_file='404.html')
     print(f'Built {len(PAGES)} pages · sacred day {SACRED} · today’s episode: {episode_for(SACRED)["title"]}')
 
 if __name__ == '__main__':
