@@ -1,0 +1,377 @@
+{
+  "status": "Believers Country Standard V1.0 — Update 01: original sourced Money Under God book cover crops + dated daily podcast archive + sharing UI. Not production published.",
+  "organization": {
+    "publicName": "Believers Country",
+    "umbrella": "CMI",
+    "fullUmbrellaSpelling": "Country Ministries International — confirm",
+    "tagline": "Living Eternal Life Abundantly.",
+    "logo": {
+      "status": "approved-and-attached",
+      "source": "CMI_Logo_All_Variants_v2(1).zip",
+      "day": "/assets/logos/cmi-display-day.svg",
+      "night": "/assets/logos/cmi-display-night.svg",
+      "originalDay": "/assets/logos/cmi-original-day.svg",
+      "originalNight": "/assets/logos/cmi-original-night.svg",
+      "favicon": "/assets/favicon-cmi.png",
+      "implementation": "Day black, Night white. Display SVGs preserve original vector path; only their viewport is fitted without distortion."
+    },
+    "publicContact": null,
+    "domain": null,
+    "identityStatement": "A people belonging to the Father. A life received in the Son. A country expressed through His Spirit.",
+    "headerDisplay": {
+      "wordmarkLines": [
+        "Believers",
+        "Country"
+      ],
+      "suffix": "CMI",
+      "icon": "unchanged official CMI mark"
+    }
+  },
+  "ministries": [
+    {
+      "name": "Believers Country",
+      "category": "Community & belonging",
+      "desc": "The communal expression of CMI: a country of believers, fellowship, citizenship and shared life.",
+      "path": "/ministries/believers-country/"
+    },
+    {
+      "name": "School of Scriptures",
+      "category": "Scripture & formation",
+      "desc": "The ministry’s teaching, study, formation and publishing expression, with Christ as interpretive centre.",
+      "path": "/ministries/school-of-scriptures/"
+    },
+    {
+      "name": "Commonwealth",
+      "category": "Welfare & stewardship",
+      "desc": "Material welfare, responsible stewardship, economic support and practical care within the community.",
+      "path": "/ministries/commonwealth/"
+    },
+    {
+      "name": "Country Vanguard",
+      "category": "Outreach & mission",
+      "desc": "Missionary mobilization, outreach and strategic deployment of service beyond the gathering.",
+      "path": "/ministries/country-vanguard/"
+    }
+  ],
+  "encounters": [
+    {
+      "key": "wed",
+      "day": "Revi’i · Wednesday",
+      "time": "6:00 PM",
+      "title": "School of Scriptures",
+      "description": "Scripture studied deeply in the light of the Son.",
+      "path": "/encounters/school-of-scriptures/",
+      "onlineLink": null,
+      "platform": null,
+      "venue": null
+    },
+    {
+      "key": "thu",
+      "day": "Chamishi · Thursday",
+      "time": "6:00 PM",
+      "title": "Ministering to the LORD",
+      "description": "Corporate prayer, ministry before the LORD and summons.",
+      "path": "/encounters/ministering-to-the-lord/",
+      "onlineLink": null,
+      "platform": null,
+      "venue": null
+    },
+    {
+      "key": "sat",
+      "day": "Shabbat · Saturday",
+      "time": "8:00 AM",
+      "title": "Shabbat Service",
+      "description": "Gathering around the Son, His Word, rest and fellowship.",
+      "path": "/encounters/shabbat-service/",
+      "onlineLink": null,
+      "platform": null,
+      "venue": null
+    }
+  ],
+  "podcast": {
+    "name": "2 Minutes Podcast",
+    "nameStatus": "user-specified",
+    "recordingCount": 4,
+    "episodes": [
+      {
+        "title": "No Separation",
+        "slug": "no-separation",
+        "audio": "/assets/audio/no-separation.mp3",
+        "path": "/listen/2-minutes/no-separation/",
+        "durationSeconds": 82.42,
+        "durationLabel": "1:22",
+        "durationISO": "PT82S",
+        "format": "audio/mpeg",
+        "sourceFilename": "No Separation.ogg",
+        "downloadFilename": "no-separation.mp3",
+        "sourceFormat": "audio/ogg; codecs=opus",
+        "speaker": null,
+        "publishedDate": "2026-10-17",
+        "transcript": null,
+        "scriptureReferences": null,
+        "archiveDate": "2026-10-17",
+        "dateType": "website archive/publication assignment by editor; original recording date not verified",
+        "dateTimezone": "Africa/Lagos"
+      },
+      {
+        "title": "Proof that you know God",
+        "slug": "proof-that-you-know-god",
+        "audio": "/assets/audio/proof-that-you-know-god.mp3",
+        "path": "/listen/2-minutes/proof-that-you-know-god/",
+        "durationSeconds": 84.72,
+        "durationLabel": "1:25",
+        "durationISO": "PT85S",
+        "format": "audio/mpeg",
+        "sourceFilename": "Proof that you know God.ogg",
+        "downloadFilename": "proof-that-you-know-god.mp3",
+        "sourceFormat": "audio/ogg; codecs=opus",
+        "speaker": null,
+        "publishedDate": "2026-10-16",
+        "transcript": null,
+        "scriptureReferences": null,
+        "archiveDate": "2026-10-16",
+        "dateType": "website archive/publication assignment by editor; original recording date not verified",
+        "dateTimezone": "Africa/Lagos"
+      },
+      {
+        "title": "What is your advantage as a believer",
+        "slug": "what-is-your-advantage-as-a-believer",
+        "audio": "/assets/audio/what-is-your-advantage-as-a-believer.mp3",
+        "path": "/listen/2-minutes/what-is-your-advantage-as-a-believer/",
+        "durationSeconds": 89.35,
+        "durationLabel": "1:29",
+        "durationISO": "PT89S",
+        "format": "audio/mpeg",
+        "sourceFilename": "What is your advantage as a believer.ogg",
+        "downloadFilename": "what-is-your-advantage-as-a-believer.mp3",
+        "sourceFormat": "audio/ogg; codecs=opus",
+        "speaker": null,
+        "publishedDate": "2026-10-15",
+        "transcript": null,
+        "scriptureReferences": null,
+        "archiveDate": "2026-10-15",
+        "dateType": "website archive/publication assignment by editor; original recording date not verified",
+        "dateTimezone": "Africa/Lagos"
+      },
+      {
+        "title": "Relationship With The Father",
+        "slug": "relationship-with-the-father",
+        "audio": "/assets/audio/relationship-with-the-father.mp3",
+        "path": "/listen/2-minutes/relationship-with-the-father/",
+        "durationSeconds": 89.33,
+        "durationLabel": "1:29",
+        "durationISO": "PT89S",
+        "format": "audio/mpeg",
+        "sourceFilename": "Relationship With The Father.ogg",
+        "downloadFilename": "relationship-with-the-father.mp3",
+        "sourceFormat": "audio/ogg; codecs=opus",
+        "speaker": null,
+        "publishedDate": "2026-10-14",
+        "transcript": null,
+        "scriptureReferences": null,
+        "archiveDate": "2026-10-14",
+        "dateType": "website archive/publication assignment by editor; original recording date not verified",
+        "dateTimezone": "Africa/Lagos"
+      }
+    ],
+    "sourceAudioArchive": "../../source-audio-originals/ (distribution package, not web root)",
+    "transcriptStatus": "Not supplied; no text transcript fabricated",
+    "publicationDates": "Unknown; order is not chronology",
+    "publisher": "Believers Country / CMI",
+    "subscriptionProviders": [],
+    "verificationStatus": "Uploaded original recordings converted to locally playable MP3; release metadata incomplete",
+    "sort": "archiveDate descending, latest first",
+    "sharePlatforms": [
+      "native",
+      "X / Twitter",
+      "WhatsApp",
+      "Facebook",
+      "LinkedIn",
+      "Telegram",
+      "Email",
+      "Copy link"
+    ]
+  },
+  "spiritualIntent": {
+    "collection": "Money Under God",
+    "titlesPendingProof": [
+      "Scriptural Wealth",
+      "How to Receive from God",
+      "The Scriptural Pattern of Debt and the Way Out",
+      "Investment & Enjoyment"
+    ],
+    "booksAvailableForSale": false,
+    "futureCollection": "The Business of the Believer",
+    "targetPublicationDate": "2026-12-17",
+    "dateApproved": false
+  },
+  "routes": {
+    "/": "index.html",
+    "/about/": "about/index.html",
+    "/ministries/": "ministries/index.html",
+    "/ministries/believers-country/": "ministries/believers-country/index.html",
+    "/ministries/school-of-scriptures/": "ministries/school-of-scriptures/index.html",
+    "/ministries/country-vanguard/": "ministries/country-vanguard/index.html",
+    "/encounters/": "encounters/index.html",
+    "/encounters/school-of-scriptures/": "encounters/school-of-scriptures/index.html",
+    "/encounters/ministering-to-the-lord/": "encounters/ministering-to-the-lord/index.html",
+    "/encounters/shabbat-service/": "encounters/shabbat-service/index.html",
+    "/listen/2-minutes/": "listen/2-minutes/index.html",
+    "/spiritual-intent/": "spiritual-intent/index.html",
+    "/spiritual-intent/books/": "spiritual-intent/books/index.html",
+    "/teachings/": "teachings/index.html",
+    "/contact/": "contact/index.html",
+    "/privacy/": "privacy/index.html",
+    "/ministries/commonwealth/": "ministries/commonwealth/index.html",
+    "/ministries/country-commonwealth/": "ministries/country-commonwealth/index.html (legacy redirect)",
+    "/listen/2-minutes/no-separation/": "listen/2-minutes/no-separation/index.html",
+    "/listen/2-minutes/proof-that-you-know-god/": "listen/2-minutes/proof-that-you-know-god/index.html",
+    "/listen/2-minutes/what-is-your-advantage-as-a-believer/": "listen/2-minutes/what-is-your-advantage-as-a-believer/index.html",
+    "/listen/2-minutes/relationship-with-the-father/": "listen/2-minutes/relationship-with-the-father/index.html"
+  },
+  "navigation": {
+    "desktop": "one-row masthead: brand left, experience centre, Menu top right (Join Encounter CTA adjacent on wide screens)",
+    "mobile": "Menu top right of brand, not beneath the experience control; at extra-narrow widths only experience moves to second line",
+    "experienceButton": {
+      "visualLabel": "Choose your experience",
+      "sequence": [
+        "day",
+        "night",
+        "system"
+      ],
+      "icons": false
+    }
+  },
+  "editorialRules": {
+    "uniqueBreadcrumbAndHeading": true,
+    "noRedundantHeroEyebrows": true,
+    "noDuplicateLeadAndFirstSectionHeading": true,
+    "noGenericRepeatedAsides": true,
+    "homepageFoundationStatus": "Approved — Ephesians 2:18–22, editorial summary; supporting John 14:16–23"
+  },
+  "ministryOverviewTitle": "CMI Ministry Expressions",
+  "pages": {
+    "about/index.html": {
+      "breadcrumb": "Discover CMI",
+      "heroTitle": "The country we call home."
+    },
+    "ministries/index.html": {
+      "breadcrumb": "Our ministries",
+      "heroTitle": "CMI Ministry Expressions"
+    },
+    "encounters/index.html": {
+      "breadcrumb": "Weekly encounters",
+      "heroTitle": "A rhythm of Scripture, prayer and fellowship."
+    },
+    "contact/index.html": {
+      "breadcrumb": "Contact",
+      "heroTitle": "We would love to welcome you."
+    },
+    "privacy/index.html": {
+      "breadcrumb": "Site information",
+      "heroTitle": "Privacy & launch status"
+    },
+    "listen/2-minutes/index.html": {
+      "breadcrumb": "The Listening Room",
+      "heroTitle": "2 Minutes Podcast"
+    },
+    "spiritual-intent/index.html": {
+      "breadcrumb": "Spiritual Intent",
+      "heroTitle": "Scripture, read in the light of Christ."
+    },
+    "spiritual-intent/books/index.html": {
+      "breadcrumb": "Spiritual Intent",
+      "heroTitle": "Money Under God"
+    },
+    "teachings/index.html": {
+      "breadcrumb": "Teachings",
+      "heroTitle": "The teaching library"
+    },
+    "ministries/believers-country/index.html": {
+      "breadcrumb": "Our ministries",
+      "heroTitle": "Believers Country"
+    },
+    "ministries/commonwealth/index.html": {
+      "breadcrumb": "Our ministries",
+      "heroTitle": "Commonwealth"
+    },
+    "ministries/country-vanguard/index.html": {
+      "breadcrumb": "Our ministries",
+      "heroTitle": "Country Vanguard"
+    },
+    "ministries/school-of-scriptures/index.html": {
+      "breadcrumb": "Our ministries",
+      "heroTitle": "School of Scriptures"
+    },
+    "encounters/ministering-to-the-lord/index.html": {
+      "breadcrumb": "Weekly encounters",
+      "heroTitle": "Ministering to the LORD"
+    },
+    "encounters/school-of-scriptures/index.html": {
+      "breadcrumb": "Weekly encounters",
+      "heroTitle": "School of Scriptures"
+    },
+    "encounters/shabbat-service/index.html": {
+      "breadcrumb": "Weekly encounters",
+      "heroTitle": "Shabbat Service"
+    }
+  },
+  "websiteVersion": "1.0.0",
+  "websiteVersionLabel": "Believers Country — Standard V1",
+  "versionBasis": "Approved integrated website V7, now frozen as public-facing website design baseline V1.0",
+  "books": {
+    "collection": "Spiritual Intent: Money Under God",
+    "approvedArtworkSource": "Faithful panels cropped from newer October 11, 2026 Spiritual Intent user Library source `Money Under God four-book collection(2).png`; exact image and crop coordinates in SOURCE_MANIFEST.json.",
+    "covers": [
+      {
+        "slug": "scriptural-wealth",
+        "title": "Scriptural Wealth",
+        "path": "/assets/books/money-under-god/scriptural-wealth.png",
+        "sourceCropXYXY": [
+          38,
+          539,
+          295,
+          944
+        ],
+        "author": "Oluwaseyi Ashiru"
+      },
+      {
+        "slug": "how-to-receive-from-god",
+        "title": "How to Receive From God",
+        "path": "/assets/books/money-under-god/how-to-receive-from-god.png",
+        "sourceCropXYXY": [
+          309,
+          539,
+          560,
+          944
+        ],
+        "author": "Oluwaseyi Ashiru"
+      },
+      {
+        "slug": "scriptural-pattern-of-debt",
+        "title": "The Scriptural Pattern of Debt and the Way Out",
+        "path": "/assets/books/money-under-god/scriptural-pattern-of-debt.png",
+        "sourceCropXYXY": [
+          569,
+          539,
+          819,
+          944
+        ],
+        "author": "Oluwaseyi Ashiru"
+      },
+      {
+        "slug": "investment-and-enjoyment",
+        "title": "Investment & Enjoyment",
+        "path": "/assets/books/money-under-god/investment-and-enjoyment.png",
+        "sourceCropXYXY": [
+          834,
+          539,
+          1090,
+          944
+        ],
+        "author": "Oluwaseyi Ashiru"
+      }
+    ],
+    "commercialStatus": "No verified purchase URL or publication status; 17 December 2026 tentative, subject to confirmation"
+  }
+}

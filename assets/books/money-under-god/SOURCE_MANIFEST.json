@@ -1,0 +1,55 @@
+{
+  "source": "Spiritual Intent user Library image: Money Under God four-book collection(2).png (11 October 2026 later artwork; includes the corrected How to Receive From God subtitle: Enjoying the life to come, here and now)",
+  "sourceWarning": "The original collection advertisement contains a proposed December 17, 2026 launch and pre-order language; only the four book designs were extracted. These are faithful ~260px-wide crops from a combined 2026-10-11 image, not independent high-resolution artwork masters.",
+  "artworkPolicy": "Faithful rectangular crops; source book visual content, cover type, titles, and colours were not redrawn or replaced.",
+  "covers": [
+    {
+      "slug": "scriptural-wealth",
+      "title": "Scriptural Wealth",
+      "path": "/assets/books/money-under-god/scriptural-wealth.png",
+      "sourceCropXYXY": [
+        20,
+        418,
+        289,
+        842
+      ],
+      "author": "Oluwaseyi Ashiru"
+    },
+    {
+      "slug": "how-to-receive-from-god",
+      "title": "How to Receive From God",
+      "path": "/assets/books/money-under-god/how-to-receive-from-god.png",
+      "sourceCropXYXY": [
+        294,
+        418,
+        554,
+        842
+      ],
+      "author": "Oluwaseyi Ashiru"
+    },
+    {
+      "slug": "scriptural-pattern-of-debt",
+      "title": "The Scriptural Pattern of Debt and the Way Out",
+      "path": "/assets/books/money-under-god/scriptural-pattern-of-debt.png",
+      "sourceCropXYXY": [
+        561,
+        418,
+        820,
+        842
+      ],
+      "author": "Oluwaseyi Ashiru"
+    },
+    {
+      "slug": "investment-and-enjoyment",
+      "title": "Investment & Enjoyment",
+      "path": "/assets/books/money-under-god/investment-and-enjoyment.png",
+      "sourceCropXYXY": [
+        824,
+        418,
+        1085,
+        842
+      ],
+      "author": "Oluwaseyi Ashiru"
+    }
+  ]
+}
