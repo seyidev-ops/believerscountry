@@ -21,6 +21,9 @@ LINKS = {
     'school': 'https://chat.whatsapp.com/Hx8FnJWmFIw3mMwKjnOXoW',
     'shabbat': 'https://chat.whatsapp.com/GXjvYUmtqAtCYTa6vNcQmV',
 }
+GIVING = dict(name='Country Ministries International', bank='Guaranty Trust Bank (GTBank)',
+              accounts=[('Naira', '₦', 'NGN', '3001282751'), ('US Dollar', '$', 'USD', '3001282775'),
+                        ('British Pound', '£', 'GBP', '3001282816'), ('Euro', '€', 'EUR', '3001282799')])
 LOGO = json.loads((ROOT / 'tools/logo_parts.json').read_text())
 SERVICES = json.loads((ROOT / 'content/shabbat-services-5787-q1.json').read_text())
 e = html.escape
@@ -78,6 +81,8 @@ def episode_for(day):
 
 # ------------------------------------------------------------------ icons
 I = {
+ 'copy': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2.5"/><path d="M5 15V5.5A2.5 2.5 0 0 1 7.5 3H15"/></svg>',
+ 'gift': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13M3 12h18M12 8S9.5 3 7 4.5 8.5 8 12 8Zm0 0s2.5-5 5-3.5S15.5 8 12 8Z"/></svg>',
  'arrow': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
  'up': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg>',
  'play': '<svg class="i-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5Z"/></svg>',
@@ -165,7 +170,7 @@ def footer(r):
 <div><a class="footer-brand" href="{r or './'}">{mark()}<span class="brand-words"><strong><span>Believers</span><span>Country</span></strong><small>CMI</small></span></a>
 <p>A people belonging to the Father. A life received in the Son. A country expressed through His Spirit.</p>
 <div class="socials"><a href="{LINKS['youtube']}" target="_blank" rel="noopener" aria-label="Believers Country on YouTube">{I['youtube']}</a><a href="{LINKS['shabbat']}" target="_blank" rel="noopener" aria-label="Join the Shabbat Service WhatsApp group">{I['whatsapp']}</a><a href="{r}contact/" aria-label="Contact Believers Country">{I['mail']}</a></div></div>
-<div class="footer-col"><h4>Discover</h4><a href="{r}about/">Who we are</a><a href="{r}ministries/">Four ministry streams</a><a href="{r}year-5787/">The Year 5787</a><a href="{r}contact/">Contact</a></div>
+<div class="footer-col"><h4>Discover</h4><a href="{r}about/">Who we are</a><a href="{r}ministries/">Four ministry streams</a><a href="{r}year-5787/">The Year 5787</a><a href="{r}contact/">Contact</a><a href="{r}contact/#give">Give · Partner</a></div>
 <div class="footer-col"><h4>Gather</h4><a href="{r}encounters/school-of-scriptures/">School of Scriptures · Wed</a><a href="{r}encounters/ministering-to-the-lord/">Ministering to the LORD · Thu</a><a href="{r}encounters/shabbat-service/">Shabbat Service · Sat</a></div>
 <div class="footer-col"><h4>Listen &amp; read</h4><a href="{r}listen/2-minutes/">2 Minutes Podcast</a><a href="{r}teachings/">Shabbat teachings</a><a href="{r}spiritual-intent/">Spiritual Intent</a><a href="{LINKS['youtube']}" target="_blank" rel="noopener">YouTube channel</a></div>
 </div>
@@ -190,8 +195,9 @@ def page(path, title, desc, body, section='', jsonld=None, extra_head='', out_fi
 <link rel="canonical" href="{url}">
 <meta property="og:type" content="website"><meta property="og:site_name" content="Believers Country"><meta property="og:title" content="{e(full_title)}"><meta property="og:description" content="{e(desc)}"><meta property="og:url" content="{url}"><meta property="og:image" content="{SITE_URL}assets/og-image.png"><meta name="twitter:card" content="summary_large_image">
 <script>(function(){{var d=document.documentElement,m='system';try{{m=localStorage.getItem('bc-experience-v3')||localStorage.getItem('bc-experience-v2')||'system'}}catch(e){{}}if(['day','night','system'].indexOf(m)<0)m='system';d.dataset.mode=m;d.dataset.theme=m==='system'?(matchMedia('(prefers-color-scheme: dark)').matches?'night':'day'):m}})()</script>
-<link rel="icon" href="{r}assets/favicon.svg" type="image/svg+xml">
-<link rel="icon" href="{r}assets/favicon-cmi.png" type="image/png" sizes="192x192">
+<link rel="icon" href="{r}assets/favicon-day.svg" type="image/svg+xml" data-favicon="{r}assets/favicon-">
+<link rel="icon" href="{r}assets/favicon-cmi.png" type="image/png" sizes="192x192" data-favicon-png="{r}assets/favicon-cmi">
+<script>(function(){{var n=document.documentElement.dataset.theme==='night',a=document.querySelector('[data-favicon]'),b=document.querySelector('[data-favicon-png]');if(a)a.href=a.dataset.favicon+(n?'night':'day')+'.svg';if(b)b.href=b.dataset.faviconPng+(n?'-night':'')+'.png'}})()</script>
 <link rel="apple-touch-icon" href="{r}assets/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="{r}assets/styles.css">
@@ -423,7 +429,7 @@ def home(r):
 {year_teaser(r)}
 
 <section class="section tight"><div class="container"><div class="callband reveal"><div><h2>Come into the <em>conversation.</em></h2><p>Start with a gathering. Listen, learn, pray, and discover the shared life of believers centred on the Son.</p></div>
-<div class="cta"><a class="button gold" href="{LINKS['shabbat']}" target="_blank" rel="noopener">{I['whatsapp']} Join this Shabbat</a><a class="button ghost" href="{LINKS['youtube']}" target="_blank" rel="noopener">{I['youtube']} Watch on YouTube</a></div></div></div></section>
+<div class="cta"><a class="button gold" href="{LINKS['shabbat']}" target="_blank" rel="noopener">{I['whatsapp']} Join this Shabbat</a><a class="button ghost" href="{r}contact/#give">{I['gift']} Give · Partner</a><a class="button ghost" href="{LINKS['youtube']}" target="_blank" rel="noopener">{I['youtube']} Watch on YouTube</a></div></div></div></section>
 '''
 
 YEAR_LETTERS = [('ת', 'Tav', 400, 'The mark', 'Sign, seal and ownership — whose you are, settled before anything is said.'),
@@ -691,11 +697,27 @@ def contact(r):
              ('Keep listening', 'Return each day for the 2 Minutes Podcast, and watch past gatherings on YouTube.')]
     st = ''.join(f'<article class="card step-card"><span class="num">0{i+1}</span><h3>{a}</h3><p>{b}</p></article>' for i, (a, b) in enumerate(steps))
     return page_hero(r, [(None, 'Contact')], 'Connect with us', 'We would love to <em>welcome you.</em>',
-                     'The quickest way to reach Believers Country is through our WhatsApp communities. Join the one that fits your week, introduce yourself, and someone will respond.') + f'''
-<section class="section tight" style="padding-top:0"><div class="container"><div class="section-head reveal"><div><h2>Join a <em>gathering.</em></h2><p class="lead">Each weekly encounter has its own WhatsApp community, where joining details and notices are shared.</p></div></div>
+                     'The quickest way to reach Believers Country is through our WhatsApp communities. Join the one that fits your week, introduce yourself, and someone will respond.',
+                     [('#gather', 'Join a gathering'), ('#give', 'Give · Partner · Support'), ('#steps', 'First steps')]) + f'''
+<section class="section tight" id="gather" style="padding-top:0"><div class="container"><div class="section-head reveal"><div><h2>Join a <em>gathering.</em></h2><p class="lead">Each weekly encounter has its own WhatsApp community, where joining details and notices are shared.</p></div></div>
 <div class="grid g3 reveal-stagger">{cards}</div>
 <a class="card yt-band reveal" href="{LINKS['youtube']}" target="_blank" rel="noopener"><span class="ico">{I['youtube']}</span><span><b>Watch on YouTube</b><small>Past gatherings and teachings · @believerscountry</small></span><span class="circle">{I['up']}</span></a></div></section>
-<section class="section tight"><div class="container"><div class="section-head reveal"><h2>Your first <em>steps.</em></h2></div><div class="grid g4 reveal-stagger">{st}</div></div></section>'''
+{give_section()}
+<section class="section tight" id="steps"><div class="container"><div class="section-head reveal"><h2>Your first <em>steps.</em></h2></div><div class="grid g4 reveal-stagger">{st}</div></div></section>'''
+
+def give_section():
+    ways = [('Offerings', 'Your regular giving and thanksgiving, offered as worship to the Lord (2 Corinthians 9:7).', 'Offering'),
+            ('Venue projects', 'Helping to secure and prepare places where believers gather, learn and are sent.', 'Venue'),
+            ('Country projects', 'Commonwealth care, Country Vanguard outreach and the work of the four streams.', 'Project')]
+    w = ''.join(f'<article class="card give-way"><div class="icon-letter" aria-hidden="true">{I["gift"]}</div><h3>{a}</h3><p>{b}</p><span class="badge">Narration: {c}</span></article>' for a, b, c in ways)
+    rows = ''.join(f'''<div class="acct"><span class="cur" aria-hidden="true">{sym}</span><span class="acct-l"><b>{name}</b><small>{code} account</small></span>
+<span class="acct-n">{num}</span><button class="chip" type="button" data-copy="{num}" aria-label="Copy {name} account number">{I['copy']} <span>Copy</span></button></div>''' for name, sym, code, num in GIVING['accounts'])
+    return f'''<section class="section tight" id="give"><div class="container"><div class="section-head reveal"><div><h2>Give, partner, <em>support.</em></h2>
+<p class="lead">Every gift is received as worship and stewarded for the life and mission of Believers Country. Choose what you are giving towards, then use the account for your currency.</p></div></div>
+<div class="give-grid"><div class="grid reveal-stagger">{w}</div>
+<div class="panel give-panel reveal"><div class="kicker">Bank transfer</div><h3>{GIVING['name']}</h3><p class="muted small" style="margin:4px 0 16px">{GIVING['bank']}</p>
+<div class="accts">{rows}</div><p class="muted small give-note">Add a narration such as <b>Offering</b>, <b>Venue</b> or <b>Project</b> so your gift goes where you intend. To partner regularly or share a testimony, message us in the Shabbat Service group.</p>
+<a class="button wa" href="{LINKS['shabbat']}" target="_blank" rel="noopener">{I['whatsapp']} Tell us about your gift</a></div></div></div></section>'''
 
 def legal(kind):
     def body(r):

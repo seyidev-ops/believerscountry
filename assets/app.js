@@ -23,6 +23,10 @@
     const next = modes[(modes.indexOf(m) + 1) % 3];
     if (toggle) toggle.setAttribute('aria-label', `Experience: ${names[m]}${m === 'system' ? ' (follows your device)' : ''}. Switch to ${names[next]}.`);
     if (label) label.textContent = names[m];
+    // The tab icon follows the site's Day/Night choice: dark mark by day, light mark by night.
+    const fav = $('[data-favicon]'), favPng = $('[data-favicon-png]');
+    if (fav) fav.href = fav.dataset.favicon + (eff === 'night' ? 'night' : 'day') + '.svg';
+    if (favPng) favPng.href = favPng.dataset.faviconPng + (eff === 'night' ? '-night' : '') + '.png';
     const meta = $('meta[name=theme-color]');
     if (meta) meta.content = eff === 'night' ? '#050913' : '#f7f2e6';
     if (save) { try { localStorage.setItem('bc-experience-v3', m); } catch (_) {} }
@@ -363,6 +367,16 @@
   });
   document.addEventListener('click', e => { if (!e.target.closest('.share')) closeShares(); });
   addEventListener('keydown', e => e.key === 'Escape' && closeShares());
+
+  /* ---------------- copy account numbers ---------------- */
+  $$('[data-copy]').forEach(b => b.addEventListener('click', async () => {
+    const t = $('span', b); let ok = false;
+    try { await navigator.clipboard.writeText(b.dataset.copy); ok = true; } catch (_) {
+      const ta = document.createElement('textarea'); ta.value = b.dataset.copy; document.body.appendChild(ta); ta.select(); try { ok = document.execCommand('copy'); } catch (_) {} ta.remove();
+    }
+    if (t) t.textContent = ok ? 'Copied' : b.dataset.copy; b.classList.add('copied');
+    setTimeout(() => { if (t) t.textContent = 'Copy'; b.classList.remove('copied'); }, 2000);
+  }));
 
   /* ---------------- footer year ---------------- */
   $$('[data-year]').forEach(el => el.textContent = new Date().getFullYear());
