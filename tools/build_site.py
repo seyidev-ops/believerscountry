@@ -28,11 +28,30 @@ e = html.escape
 def slugify(t):
     return re.sub(r'[^a-z0-9]+', '-', t.lower()).strip('-')
 
+def hms(sec):
+    sec = int(round(sec)); h, m = divmod(sec // 60, 60)
+    return f'{h}:{m:02d}:{sec % 60:02d}' if h else f'{m}:{sec % 60:02d}'
+
+def probe(path):
+    import subprocess
+    try:
+        return float(subprocess.check_output(['ffprobe', '-v', 'error', '-show_entries', 'format=duration', '-of', 'default=nw=1:nk=1', str(path)]).decode().strip())
+    except Exception:
+        return None
+
 for s in SERVICES:
     s['slug'] = slugify(s['title'])
+    f = ROOT / 'assets/audio/shabbat' / (s['slug'] + '.mp3')
+    d = probe(f) if f.exists() else None
+    if d:
+        s['audio'] = f"assets/audio/shabbat/{s['slug']}.mp3"
+        s['seconds'] = int(round(d)); s['label'] = hms(d)
+        s['path'] = f"teachings/{s['slug']}/"; s['word'] = s['title']
     s['iso'] = dt.datetime.strptime(s['date'], '%d %B %Y').date().isoformat()
 
 EPISODES = [
+    dict(slug='the-measuring-line', title='The Measuring Line', date='2026-10-19', seconds=90, label='1:30',
+         word='The measuring line', blurb='A short word from Believers Country on the measuring line. Press play, then carry it with you through the day.'),
     dict(slug='no-separation', title='No Separation', date='2026-10-17', seconds=82, label='1:22',
          word='Nothing stands between', blurb='Nothing created stands between the believer and the love of God in Christ. A short word on union that cannot be broken.'),
     dict(slug='proof-that-you-know-god', title='Proof that you know God', date='2026-10-16', seconds=85, label='1:25',
@@ -211,15 +230,17 @@ def player(r, ep, today=False, feature=False, tools=True):
     attrs = 'data-today-player ' if today else ''
     t = ''
     if tools:
-        t = (f'<div class="player-tools"><a class="chip" data-download href="{r}{ep["audio"]}" download="{ep["slug"]}.mp3">{I["download"]} MP3</a>'
+        skip = ('<button class="chip" type="button" data-skip="-15" aria-label="Back 15 seconds">↺ 15s</button><button class="chip" type="button" data-skip="30" aria-label="Forward 30 seconds">30s ↻</button>'
+                if ep['seconds'] > 600 else '')
+        t = (f'<div class="player-tools">{skip}<a class="chip" data-download href="{r}{ep["audio"]}" download="{ep["slug"]}.mp3">{I["download"]} MP3</a>'
              f'{share_box(ep["title"], r + ep["path"])}</div>')
-    return (f'<div class="player{" feature" if feature else ""}" {attrs}data-src="{r}{ep["audio"]}" data-duration="{ep["seconds"]}">'
+    return (f'<div class="player{" feature" if feature else ""}" {attrs}data-src="{r}{ep["audio"]}" data-duration="{ep["seconds"]}" data-album="{'Shabbat Services 5787' if ep['seconds'] > 600 else '2 Minutes Podcast'}">'
             f'<button class="play" type="button" aria-label="Play {e(ep["title"])}">{I["play"]}{I["pause"]}</button>'
             f'<div class="player-body"><div class="player-title">{e(ep["title"])}</div><div class="bars" aria-hidden="true"></div>'
             f'<div class="player-time"><span class="t-cur">0:00</span><span class="t-total">{ep["label"]}</span></div>{t}</div></div>')
 
 def ep_card(r, ep):
-    ax = {'no-separation': '25%', 'proof-that-you-know-god': '70%', 'what-is-your-advantage-as-a-believer': '45%', 'relationship-with-the-father': '80%'}[ep['slug']]
+    ax = {'the-measuring-line': '60%', 'no-separation': '25%', 'proof-that-you-know-god': '70%', 'what-is-your-advantage-as-a-believer': '45%', 'relationship-with-the-father': '80%'}[ep['slug']]
     return f'''<article class="card ep" style="--ax:{ax}"><div class="art" aria-hidden="true"><span class="rings"></span><span class="art-dur">{ep['label']}</span><span class="art-word">{e(ep['word'])}</span></div>
 <div class="kicker">{ep['pretty']} <span class="badge latest" data-today-flag="{ep['slug']}" hidden>Today</span></div>
 <h3><a class="card-link" href="{r}{ep['path']}">{e(ep['title'])}</a></h3><p>{e(ep['blurb'])}</p>{player(r, ep)}</article>'''
@@ -227,10 +248,16 @@ def ep_card(r, ep):
 def svc_card(r, s, featured=False):
     letters = gem(s['seq'])
     return f'''<article class="card teach{' featured' if featured else ''}" data-teach data-svc-date="{s['iso']}"><span class="glyph hebrew" aria-hidden="true">{letters}</span>
-<div class="meta"><span class="badge" data-status>Shabbat {s['n']} of 13</span><span class="badge">{s['hebrew']} · Seq {s['seq']}</span></div>
+<div class="meta"><span class="badge" data-status>Shabbat {s['n']} of 13</span><span class="badge">{s['hebrew']} · Seq {s['seq']}</span>{f'<span class="badge audio">{I["headphones"]} Listen · {s["label"]}</span>' if s.get('audio') else ''}</div>
 <div class="kicker">{dt.date.fromisoformat(s['iso']).strftime('%-d %B %Y')}</div>
 <h3><a class="card-link" href="{r}teachings/{s['slug']}/">{e(s['title'])}</a></h3><div class="focus">{e(s['focus'])}</div>
-<div class="open"><span>Open the teaching</span><span class="circle">{I['arrow']}</span></div></article>'''
+<div class="open"><span>{'Listen or read' if s.get('audio') else 'Open the teaching'}</span><span class="circle">{I['arrow']}</span></div></article>'''
+
+def svc_player(r, s):
+    if not s.get('audio'):
+        return ''
+    return (f'<div class="panel feature-player svc-listen" id="listen" style="margin-bottom:34px"><div class="today-label">{I["headphones"].replace("<svg", "<svg width=14 height=14")} Listen to this Shabbat service · {s["label"]}</div>'
+            f'{player(r, s, feature=True)}<p class="muted small" style="margin:12px 0 0">Keep listening with your screen locked, or download the MP3 for the road.</p></div>')
 
 def gem(n):
     H = ['', 'ק', 'ר', 'ש', 'ת']; T = ['', 'י', 'כ', 'ל', 'מ', 'נ', 'ס', 'ע', 'פ', 'צ']; U = ['', 'א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז', 'ח', 'ט']
@@ -357,7 +384,7 @@ def home(r):
 <div class="grid g3 reveal-stagger">{enc}</div></div></section>
 
 <section class="section"><div class="container">
-<div class="section-head reveal"><div><div class="eyebrow">Shabbat teachings · First quarter 5787</div><h2>Celebrating <em>the Son.</em></h2><p class="lead">Thirteen Sabbaths moving through the person and work of Christ — from His place before all things to the promise of His return.</p></div><a class="textlink" href="{r}teachings/">The full teaching library <span class="arr">→</span></a></div>
+<div class="section-head reveal"><div><div class="eyebrow">Shabbat teachings · First quarter 5787</div><h2>Celebrating <em>the Son.</em></h2><p class="lead">Thirteen Sabbaths moving through the person and work of Christ — from His place before all things to the promise of His return. Read them, or listen to the full services on the go.</p></div><div style="display:flex;gap:10px;flex-wrap:wrap"><a class="button ghost" href="{r}listen/2-minutes/#shabbat">{I['headphones']} Listen to the services</a><a class="textlink" href="{r}teachings/">The full library <span class="arr">→</span></a></div></div>
 <div class="teach-grid reveal-stagger">{''.join(svc_card(r, s, i == 0) for i, s in enumerate(feat))}</div></div></section>
 
 <section class="section tight"><div class="container grid g2">
@@ -495,7 +522,18 @@ def listen(r):
 <p class="muted small" style="margin:14px 0 0">A new day begins at 6:00 PM, and so does the day’s word. <a class="textlink" data-today-link href="{r}{ep['path']}">Episode page <span class="arr">→</span></a></p></div></div></section>
 <section class="section tight"><div class="container"><div class="section-head reveal"><div><div class="eyebrow">Episode library</div><h2>Every <em>word.</em></h2></div>
 <a class="button ghost" href="{LINKS['youtube']}" target="_blank" rel="noopener">{I['youtube']} More on YouTube</a></div><div class="ep-grid reveal-stagger">{''.join(ep_card(r, x) for x in EPISODES)}</div></div></section>
+{shabbat_audio(r)}
 {next_steps(r, [('teachings/', 'Shabbat teachings', 'Longer studies through the person and work of the Son.'), ('spiritual-intent/', 'Spiritual Intent', 'Books for careful, Christ-centred study.'), ('encounters/', 'Gather with us', 'Three weekly encounters.')])}'''
+
+def shabbat_audio(r):
+    rec = [x for x in reversed(SERVICES) if x.get('audio')]
+    if not rec:
+        return ''
+    rows = ''.join(f'''<article class="card svc-row"><div class="svc-meta"><div class="kicker">Shabbat {x['n']} · {dt.date.fromisoformat(x['iso']).strftime('%-d %B %Y')}</div>
+<h3><a class="card-link" href="{r}teachings/{x['slug']}/">{e(x['title'])}</a></h3><div class="focus">{e(x['focus'])}</div></div>{player(r, x)}</article>''' for x in rec)
+    return f'''<section class="section tight" id="shabbat"><div class="container"><div class="section-head reveal"><div><div class="eyebrow">Shabbat services · audio</div><h2>Take the Sabbath <em>with you.</em></h2>
+<p class="lead">Full Shabbat services celebrating the Son. Listen on the way, at work or at rest — each one also opens as a written teaching.</p></div><a class="textlink" href="{r}teachings/">The teaching library <span class="arr">→</span></a></div>
+<div class="grid reveal-stagger">{rows}</div></div></section>'''
 
 def episode_page(ep, idx):
     def body(r):
@@ -535,9 +573,10 @@ def teaching_page(s, idx):
         pager = '<div class="pager">' + (f'<a class="card" href="{r}teachings/{prev["slug"]}/"><div class="kicker">← Shabbat {prev["n"]}</div><h3>{e(prev["title"])}</h3></a>' if prev else '<span></span>') + (f'<a class="card next" href="{r}teachings/{nxt["slug"]}/"><div class="kicker">Shabbat {nxt["n"]} →</div><h3>{e(nxt["title"])}</h3></a>' if nxt else '<span></span>') + '</div>'
         date = dt.date.fromisoformat(s['iso']).strftime('%A, %-d %B %Y')
         return page_hero(r, [('teachings/', 'Teachings'), (None, f"Shabbat {s['n']}")], f"Shabbat service {s['n']} of 13 · {s['hebrew']} 5787 · Sequence {s['seq']}", e(s['title']), e(s['kicker']),
-                         [('#theme', 'The theme'), ('#school', 'School of Scriptures'), ('#table', 'The Table'), ('#summons', 'The summons')], side=False) + f'''
+                         ([('#listen', 'Listen')] if s.get('audio') else []) + [('#theme', 'The theme'), ('#school', 'School of Scriptures'), ('#table', 'The Table'), ('#summons', 'The summons')], side=False) + f'''
 <section class="section tight" style="padding-top:0"><div class="container article">
 <div class="prose reveal">
+{svc_player(r, s)}
 <p class="pull">{e(s['implication'])}</p>
 <h2 id="theme">The <em>theme.</em></h2>{theme}
 <h2 id="school">The School of <em>Scriptures.</em></h2>{school}

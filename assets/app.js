@@ -193,7 +193,7 @@
   $$('[data-today-flag]').forEach(el => { if (todayEp) el.hidden = el.dataset.todayFlag !== todayEp.slug; });
 
   /* ---------------- players ---------------- */
-  const tfmt = s => isFinite(s) ? `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}` : '0:00';
+  const tfmt = s => { if (!isFinite(s)) return '0:00'; s = Math.floor(s); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), ss = String(s % 60).padStart(2, '0'); return h ? `${h}:${String(m).padStart(2, '0')}:${ss}` : `${m}:${ss}`; };
   const players = $$('.player[data-src]');
   players.forEach(p => {
     const bars = $('.bars', p), btn = $('.play', p);
@@ -214,9 +214,18 @@
     const ensure = () => {
       if (audio) return audio;
       audio = new Audio(p.dataset.src); audio.preload = 'metadata';
+      if (p.dataset.resume) { const at = Number(p.dataset.resume); audio.addEventListener('loadedmetadata', () => { if (at < audio.duration - 5) audio.currentTime = at; }, { once: true }); }
       audio.addEventListener('timeupdate', paint);
       audio.addEventListener('loadedmetadata', paint);
-      audio.addEventListener('play', () => { p.classList.add('playing'); btn.setAttribute('aria-label', 'Pause ' + ($('.player-title', p)?.textContent || '')); p.closest('.ep')?.classList.add('playing-card'); players.forEach(o => o !== p && o._audio && o._audio.pause()); });
+      audio.addEventListener('play', () => {
+        if ('mediaSession' in navigator) {
+          try {
+            navigator.mediaSession.metadata = new MediaMetadata({ title: $('.player-title', p)?.textContent || 'Believers Country', artist: 'Believers Country', album: p.dataset.album || 'Believers Country', artwork: [{ src: ROOT + 'assets/favicon-512.png', sizes: '512x512', type: 'image/png' }] });
+            navigator.mediaSession.setActionHandler('seekbackward', () => { audio.currentTime -= 15; });
+            navigator.mediaSession.setActionHandler('seekforward', () => { audio.currentTime += 30; });
+          } catch (_) {}
+        }
+        p.classList.add('playing'); btn.setAttribute('aria-label', 'Pause ' + ($('.player-title', p)?.textContent || '')); p.closest('.ep')?.classList.add('playing-card'); players.forEach(o => o !== p && o._audio && o._audio.pause()); });
       audio.addEventListener('pause', () => { p.classList.remove('playing'); btn.setAttribute('aria-label', 'Play ' + ($('.player-title', p)?.textContent || '')); p.closest('.ep')?.classList.remove('playing-card'); });
       audio.addEventListener('ended', () => { audio.currentTime = 0; paint(); });
       p._audio = audio; return audio;
@@ -224,6 +233,14 @@
     btn && btn.addEventListener('click', () => { const a = ensure(); a.paused ? a.play().catch(() => {}) : a.pause(); });
     bars && bars.addEventListener('click', e => { const a = ensure(); const r = bars.getBoundingClientRect(); const go = () => { a.currentTime = (e.clientX - r.left) / r.width * a.duration; paint(); }; a.readyState >= 1 ? go() : a.addEventListener('loadedmetadata', go, { once: true }); });
     p.addEventListener('keydown', e => { if (!audio) return; if (e.key === 'ArrowRight') audio.currentTime += 10; if (e.key === 'ArrowLeft') audio.currentTime -= 10; });
+    $$('[data-skip]', p).forEach(b => b.addEventListener('click', () => { const a = ensure(); a.currentTime = Math.max(0, a.currentTime + Number(b.dataset.skip)); paint(); }));
+    // Long recordings remember where the listener stopped.
+    const longForm = Number(p.dataset.duration) > 600, posKey = 'bc-pos:' + p.dataset.src;
+    if (longForm) {
+      let saved = 0; try { saved = Number(localStorage.getItem(posKey)) || 0; } catch (_) {}
+      if (saved > 30) { p.dataset.resume = saved; const c = $('.t-cur', p); if (c) c.textContent = 'Resume at ' + tfmt(saved); }
+      setInterval(() => { if (audio && !audio.paused) { try { localStorage.setItem(posKey, String(Math.floor(audio.currentTime))); } catch (_) {} } }, 5000);
+    }
   });
 
   /* ---------------- encounters: next gathering & countdown ---------------- */

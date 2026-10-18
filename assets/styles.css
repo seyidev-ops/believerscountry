@@ -486,3 +486,14 @@ ul.clean{list-style:none;padding:0;margin:0}
   .reveal,.reveal-stagger>*{opacity:1;transform:none}
 }
 @media print{.site-header,.footer,.sky,#sky-canvas,.aurora,.land,.clouds{display:none!important}body{background:#fff;color:#000}}
+
+/* shabbat audio */
+.badge.audio{border-color:var(--line2);color:var(--gold)}
+.badge.audio svg{width:12px;height:12px}
+.svc-row{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.4fr);gap:24px;align-items:center}
+.svc-row h3{margin:6px 0 4px}
+.svc-row .focus{font:600 italic 16px var(--font-display);color:var(--gold)}
+.svc-row .player-title{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.svc-listen .player-title{white-space:normal}
+@media (max-width:860px){.svc-row{grid-template-columns:minmax(0,1fr);gap:14px}}
+@media (max-width:620px){.feature-player .play{width:64px;height:64px}.feature-player .player{align-items:flex-start}}
