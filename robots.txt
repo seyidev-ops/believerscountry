@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://seyidev-ops.github.io/cmi/sitemap.xml
