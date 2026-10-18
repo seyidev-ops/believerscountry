@@ -97,6 +97,8 @@
       document.body.classList.toggle('locked', open);
     };
     menuBtn.addEventListener('click', () => set(drawer.hidden));
+    const dg = $$('details.d-group', drawer);
+    dg.forEach(d => d.addEventListener('toggle', () => { if (d.open) dg.forEach(o => { if (o !== d) o.open = false; }); }));
     $$('a', drawer).forEach(a => a.addEventListener('click', () => set(false)));
     addEventListener('keydown', e => { if (e.key === 'Escape' && !drawer.hidden) { set(false); menuBtn.focus(); } });
     addEventListener('resize', () => innerWidth > 920 && !drawer.hidden && set(false));
@@ -321,6 +323,26 @@
     };
     search.addEventListener('input', run);
     chips.forEach(c => c.addEventListener('click', () => { mode = c.dataset.filter; chips.forEach(x => x.setAttribute('aria-pressed', String(x === c))); run(); }));
+  }
+
+  /* ---------------- listening room archive ---------------- */
+  const arcList = $('[data-arc-list]');
+  if (arcList) {
+    const rows = $$('[data-arc]', arcList), q = $('[data-arc-search]'), sortSel = $('[data-arc-sort]'), kinds = $$('[data-arc-kind]'), count = $('[data-arc-count]'), empty = $('[data-arc-empty]');
+    let kind = location.hash === '#shabbat' ? 'shabbat' : 'all';
+    const run = () => {
+      const term = q.value.toLowerCase().trim(), mode = sortSel.value;
+      const sorted = [...rows].sort((a, b) => mode === 'az' ? a.dataset.title.localeCompare(b.dataset.title) : mode === 'old' ? a.dataset.date.localeCompare(b.dataset.date) : b.dataset.date.localeCompare(a.dataset.date));
+      let shown = 0;
+      sorted.forEach(r => { arcList.appendChild(r); const ok = (kind === 'all' || r.dataset.kind === kind) && (!term || r.textContent.toLowerCase().includes(term)); r.hidden = !ok; if (ok) shown++; });
+      kinds.forEach(c => c.setAttribute('aria-pressed', String(c.dataset.arcKind === kind)));
+      if (count) count.textContent = shown + (shown === 1 ? ' recording' : ' recordings');
+      if (empty) empty.hidden = !!shown;
+    };
+    q.addEventListener('input', run); sortSel.addEventListener('change', run);
+    kinds.forEach(c => c.addEventListener('click', () => { kind = c.dataset.arcKind; run(); }));
+    addEventListener('hashchange', () => { if (location.hash === '#shabbat') { kind = 'shabbat'; run(); } });
+    run();
   }
 
   /* ---------------- sharing ---------------- */

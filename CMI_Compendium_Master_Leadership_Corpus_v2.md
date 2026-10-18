@@ -1,4 +1,4 @@
-# CMI MASTER LEADERSHIP CORPUS — VERSION 2.0
+# CMI MASTER LEADERSHIP CORPUS — VERSION 2.1
 
 COUNTRY MINISTRY INTERNATIONAL  ·  BELIEVERS COUNTRY
 COUNTRY MINISTRY INTERNATIONAL
@@ -790,7 +790,7 @@ No leader is considered formed merely because the leader can repeat CMI terminol
 19.1 The Weaponization Test
 Before a leader completes this corpus, the leader should be able to teach the central message without notes, locate the principal confirmation texts, answer the ten objections above, conduct a Shabbat assembly, distinguish a summons from an impulse, explain the four streams, and train another citizen to do the same. The goal is not argumentative aggression. The goal is doctrinal readiness: the ability to carry the message intact under pressure.
 20. CMI CORE DECLARATION
-Yeshua is Salvation. His life is our life, His finished work is our standing, His Spirit is our indwelling witness and power, and His present Lordship is the government under which we live. We are believers — citizens formed in Christ, taught by Scripture, joined in commonwealth and sent into the nations. We live Eternal Life in Abundance: Zoe received in the Son, Perisson expressed through a life yielded to Him. We minister to the Lord, we test what we hear, we obey the summons we can establish, we carry one river through four streams, and we order our time so that rest, word, communion, service and mission remain visible. We are marked before we are armed, formed before we speak, and restrained before we wield an edge. Christ is the centre. Scripture is the witness. The Spirit glorifies the Son. The Country belongs to the King.
+Yeshua is Salvation. His life is our life, His finished work is our standing, His Spirit is our indwelling witness and power, and His present Lordship is the government under which we live. We are believers — citizens formed in Christ, taught by Scripture, joined in commonwealth and sent into the nations. We live Eternal Life in Abundance: Zoe received in the Son, Perisson expressed through a life yielded to Him. We minister to the Lord, we test what we hear, we obey the summons we can establish, we carry one river through four streams, and we order our time so that rest, word, communion, service and mission remain visible. We are marked before we are armed, formed before we speak, and restrained before we wield an edge. Christ is the centre. Scripture is the witness. The Spirit glorifies the Son. The Son honours the Father. The Country belongs to the Father.
 20.1 PUBLIC IDENTITY AND SCRIPTURE FOUNDATION
 The public-facing identity of Believers Country is given in section 2.3. Its primary corporate text is Ephesians 2:18–22: through Christ, by one Spirit, access to the Father; no longer strangers, believers become fellow citizens and God's household, built together in the Spirit. John 14:16–23 supplies the personal participation and indwelling dimension. Galatians 4:4–7 and Romans 8:14–17 confirm that the Son's work and the Spirit's witness establish received sonship, not institutional merit. John 1:4 remains foundational to the Son as the source of life, but is no longer the standalone website foundation panel. In publication, communicate the substance without mistaking editorial paraphrase for a verbatim Bible quotation.
 CMI public navigation and ministry naming use: Believers Country, School of Scriptures, Commonwealth, and Country Vanguard. This change is a public-label refinement, not a change to the one-river/four-streams framework.
@@ -849,7 +849,7 @@ APPENDIX C — DOCUMENT CONTROL
 	Leadership Training Edition — Master Corpus
 
 	Version
-	2.0
+	2.1
 
 	Status
 	Foundational corpus; executive summary to be produced separately
@@ -870,3 +870,7 @@ Date — 17 October 2026.
 4. Added section 20.1 and the new Scripture index entry to support leadership formation and digital publication.
 5. The governing documents continue to distinguish doctrinal evidence from institutional house language and operational policy. The current website uses non-repetitive content design and the single 'Choose your experience' control.
 6. Version 2.0 is produced from the full extracted text of the authorized V1 in the CMI Project Library, because its original binary Word file was not available for direct byte-level editing. Original content was retained in full apart from the specifically recorded alterations above; visual styles, tables and pagination were reconstructed. Keep V1 as the reference archive.
+
+APPENDIX E — VERSION 2.1 APPROVED AMENDMENT REGISTER
+Date — 18 October 2026.
+1. Section 20, CMI Core Declaration: the closing confession now reads "Christ is the centre. Scripture is the witness. The Spirit glorifies the Son. The Son honours the Father. The Country belongs to the Father." The added sentence "The Son honours the Father" completes the Father–Son–Spirit order of the approved public identity (section 2.3), and "The Country belongs to the Father" replaces "The Country belongs to the King." No other content was changed.

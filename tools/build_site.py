@@ -149,7 +149,7 @@ def header(r, section):
         top.append(f'<div class="nav-group" data-nav-group><button class="nav-item" type="button" aria-expanded="false" aria-controls="nav-m{i}"{" data-current" if cur else ""}>{label}{chev}</button>'
                    f'<div class="nav-menu" id="nav-m{i}">{menu}</div></div>')
         sub = ''.join(f'<a href="{r}{h}">{t}<small>{d}</small></a>' for h, t, d in items)
-        drawer.append(f'<details class="d-group"{" open" if cur else ""}><summary>{label}{chev}</summary><div class="d-sub">{sub}</div></details>')
+        drawer.append(f'<details class="d-group" name="d-nav"{" open" if cur else ""}><summary>{label}{chev}</summary><div class="d-sub">{sub}</div></details>')
     return f'''<a class="skip" href="#main">Skip to content</a>
 <header class="site-header"><div class="container"><div class="bar">
 <a class="brand" href="{r or './'}" aria-label="Believers Country — home">{mark(still=True)}<span class="brand-words"><strong><span>Believers</span><span>Country</span></strong><small>CMI</small></span></a>
@@ -468,7 +468,7 @@ def about(r):
 </div></section>
 
 <section class="section tight" id="declaration"><div class="container"><div class="summons reveal"><div class="kicker">The CMI core declaration</div>
-<p>Yeshua is Salvation. His life is our life, His finished work is our standing, His Spirit is our indwelling witness and power, and His present Lordship is the government under which we live. We are marked before we are armed, formed before we speak, and restrained before we wield an edge. Christ is the centre. Scripture is the witness. The Spirit glorifies the Son. The Country belongs to the King.</p></div></div></section>
+<p>Yeshua is Salvation. His life is our life, His finished work is our standing, His Spirit is our indwelling witness and power, and His present Lordship is the government under which we live. We are marked before we are armed, formed before we speak, and restrained before we wield an edge. Christ is the centre. Scripture is the witness. The Spirit glorifies the Son. The Son honours the Father. The Country belongs to the Father.</p></div></div></section>
 {next_steps(r, [('ministries/', 'The four streams', 'See how one river becomes four ministries.'), ('encounters/', 'Weekly encounters', 'Wednesday, Thursday and Shabbat.'), ('teachings/', 'Shabbat teachings', 'Thirteen Sabbaths celebrating the Son.')])}'''
 
 def next_steps(r, items, title='Where to <em>next.</em>'):
@@ -533,17 +533,34 @@ def encounter_page(x, idx):
     page(f"encounters/{x['slug']}/", x['title'], f"{x['title']} — every {x['day']} at {x['time']} WAT. {x['short']}", body, 'encounters')
 
 # ------------------------------------------------------------------ LISTEN
+def archive_row(r, x, kind):
+    d = dt.date.fromisoformat(x['iso'] if kind == 'shabbat' else x['date'])
+    if kind == 'shabbat':
+        label, sub, href = f"Shabbat service {x['n']}", x['focus'], f"teachings/{x['slug']}/"
+    else:
+        label, sub, href = '2 Minutes', x['blurb'], x['path']
+    return (f'<article class="arc-row" data-arc data-kind="{kind}" data-date="{d.isoformat()}" data-title="{e(x["title"].lower())}">'
+            f'<div class="arc-date"><b>{d.day}</b><span>{d.strftime("%b %Y")}</span><small>{d.strftime("%A")}</small></div>'
+            f'<div class="arc-info"><span class="badge{" audio" if kind == "shabbat" else ""}">{label} · {x["label"]}</span>'
+            f'<h3><a href="{r}{href}">{e(x["title"])}</a></h3><p>{e(sub)}</p></div>{player(r, x)}</article>')
+
 def listen(r):
     ep = episode_for(SACRED)
+    rows = [archive_row(r, x, 'podcast') for x in EPISODES] + [archive_row(r, x, 'shabbat') for x in SERVICES if x.get('audio')]
+    n_pod, n_sab = len(EPISODES), len([x for x in SERVICES if x.get('audio')])
     return page_hero(r, [(None, 'Listen')], 'The listening room', '2 Minutes <em>Podcast.</em>',
-                     'A brief word, with room to reflect. Original recordings from Believers Country — play here, download for later, or share with someone who needs it today.', side=False) + f'''
+                     'A brief word, with room to reflect — and the full Shabbat services for the road. Play here, download for later, or share with someone who needs it today.', side=False) + f'''
 <section class="section tight" style="padding-top:0"><div class="container"><div class="panel feature-player reveal" data-today-wrap>
 <div class="today-label"><span class="live-dot"></span> Today’s 2 minutes · <span data-hcivil></span></div>{player(r, ep, today=True, feature=True)}
 <p class="muted small" style="margin:14px 0 0">A new day begins at 6:00 PM, and so does the day’s word. <a class="textlink" data-today-link href="{r}{ep['path']}">Episode page <span class="arr">→</span></a></p></div></div></section>
-<section class="section tight"><div class="container"><div class="section-head reveal"><div><div class="eyebrow">Episode library</div><h2>Every <em>word.</em></h2></div>
-<a class="button ghost" href="{LINKS['youtube']}" target="_blank" rel="noopener">{I['youtube']} More on YouTube</a></div><div class="ep-grid reveal-stagger">{''.join(ep_card(r, x) for x in EPISODES)}</div></div></section>
-{shabbat_audio(r)}
-{next_steps(r, [('teachings/', 'Shabbat teachings', 'Longer studies through the person and work of the Son.'), ('spiritual-intent/', 'Spiritual Intent', 'Books for careful, Christ-centred study.'), ('encounters/', 'Gather with us', 'Three weekly encounters.')])}'''
+<section class="section tight" id="archive"><span id="shabbat"></span><div class="container"><div class="section-head reveal"><div><h2>The <em>archive.</em></h2><p class="lead">Every recording in one place. Search by title or topic, filter by kind, and sort by date.</p></div>
+<a class="button ghost" href="{LINKS['youtube']}" target="_blank" rel="noopener">{I['youtube']} More on YouTube</a></div>
+<div class="filters reveal" data-arc-tools><label class="sr-only" for="arc-q">Search recordings</label><input id="arc-q" type="search" placeholder="Search a title, topic or scripture…" data-arc-search>
+<button class="chip" type="button" data-arc-kind="all" aria-pressed="true">All {n_pod + n_sab}</button><button class="chip" type="button" data-arc-kind="podcast" aria-pressed="false">2 Minutes · {n_pod}</button><button class="chip" type="button" data-arc-kind="shabbat" aria-pressed="false">Shabbat services · {n_sab}</button>
+<label class="sr-only" for="arc-sort">Sort recordings</label><select id="arc-sort" class="chip sort" data-arc-sort><option value="new">Newest first</option><option value="old">Oldest first</option><option value="az">Title A–Z</option></select></div>
+<p class="muted small" data-arc-count aria-live="polite"></p>
+<div class="arc-list" data-arc-list>{''.join(rows)}</div><p class="empty" data-arc-empty hidden>No recording matches that search.</p></div></section>
+{next_steps(r, [('teachings/', 'Shabbat teachings', 'Read the services Sabbath by Sabbath.'), ('spiritual-intent/', 'Spiritual Intent', 'Books for careful, Christ-centred study.'), ('encounters/', 'Gather with us', 'Three weekly encounters.')])}'''
 
 def shabbat_audio(r):
     rec = [x for x in reversed(SERVICES) if x.get('audio')]
@@ -662,18 +679,23 @@ def year(r):
 
 # ------------------------------------------------------------------ CONTACT / LEGAL
 def contact(r):
-    tiles = [(LINKS['shabbat'], 'whatsapp', 'Shabbat Service', 'Saturdays · 8:00 AM WAT'), (LINKS['school'], 'whatsapp', 'School of Scriptures', 'Wednesdays · 6:00 PM WAT'),
-             (LINKS['ministering'], 'whatsapp', 'Ministering to the LORD', 'Thursdays · 6:00 PM WAT'), (LINKS['youtube'], 'youtube', 'YouTube', '@believerscountry')]
-    t = ''.join(f'<a class="card link-tile" href="{h}" target="_blank" rel="noopener"><span class="ico" style="color:{"#1fae5a" if ic == "whatsapp" else "#e33"}">{I[ic]}</span><span><b>{n}</b><small>{d}</small></span></a>' for h, ic, n, d in tiles)
+    order = sorted(ENCOUNTERS, key=lambda x: {'sat': 0, 'wed': 1, 'thu': 2}[x['key']])
+    cards = ''.join(f'''<article class="card join-card"><div class="join-top"><div class="icon-letter hebrew" aria-hidden="true">{x['letter']}</div>
+<div class="join-when"><b>{x['day']}</b><span>{x['time']} WAT</span></div></div>
+<h3>{x['title']}</h3><p>{x['short']}</p><div class="next" data-next="{x['key']}">Every {x['day']}</div>
+<div class="join-actions"><a class="button wa" href="{x['link']}" target="_blank" rel="noopener">{I['whatsapp']} Join the group</a><button class="chip" type="button" data-ics="{x['key']}">{I['cal']} Add to calendar</button></div>
+{'<span class="badge latest join-flag">Best place to begin</span>' if x['key'] == 'sat' else ''}</article>''' for x in order)
+    steps = [('Choose a community', 'Shabbat Service is the best place to begin. The Wednesday and Thursday groups are for study and prayer.'),
+             ('Say hello', 'Introduce yourself in the group. Questions about faith, prayer requests and visiting are all welcome there.'),
+             ('Join a gathering', 'Joining details for each encounter are shared in its group before it begins.'),
+             ('Keep listening', 'Return each day for the 2 Minutes Podcast, and watch past gatherings on YouTube.')]
+    st = ''.join(f'<article class="card step-card"><span class="num">0{i+1}</span><h3>{a}</h3><p>{b}</p></article>' for i, (a, b) in enumerate(steps))
     return page_hero(r, [(None, 'Contact')], 'Connect with us', 'We would love to <em>welcome you.</em>',
                      'The quickest way to reach Believers Country is through our WhatsApp communities. Join the one that fits your week, introduce yourself, and someone will respond.') + f'''
-<section class="section tight" style="padding-top:0"><div class="container"><div class="links-band reveal-stagger">{t}</div></div></section>
-<section class="section tight"><div class="container article"><div class="reveal"><h2 style="margin-bottom:24px">Your first <em>steps.</em></h2>
-<ol class="steps clean"><li><span><b>Choose a community</b><span>Shabbat Service is the best place to begin; the Wednesday and Thursday groups are for study and prayer.</span></span></li>
-<li><span><b>Say hello</b><span>Introduce yourself in the group — questions about faith, prayer requests and visiting are all welcome there.</span></span></li>
-<li><span><b>Join a gathering</b><span>Joining details for each encounter are shared in its group.</span></span></li>
-<li><span><b>Keep listening</b><span>Return each day for the 2 Minutes Podcast, and watch past gatherings on YouTube.</span></span></li></ol></div>
-<aside class="aside reveal"><div class="panel"><div class="kicker">Weekly rhythm</div><div class="facts small" style="margin-top:10px"><div><span>Wednesday</span><b>School of Scriptures · 6 PM</b></div><div><span>Thursday</span><b>Ministering to the LORD · 6 PM</b></div><div><span>Saturday</span><b>Shabbat Service · 8 AM</b></div></div></div><a class="button ghost" href="{r}encounters/">See encounter details {I['arrow']}</a></aside></div></section>'''
+<section class="section tight" style="padding-top:0"><div class="container"><div class="section-head reveal"><div><h2>Join a <em>gathering.</em></h2><p class="lead">Each weekly encounter has its own WhatsApp community, where joining details and notices are shared.</p></div></div>
+<div class="grid g3 reveal-stagger">{cards}</div>
+<a class="card yt-band reveal" href="{LINKS['youtube']}" target="_blank" rel="noopener"><span class="ico">{I['youtube']}</span><span><b>Watch on YouTube</b><small>Past gatherings and teachings · @believerscountry</small></span><span class="circle">{I['up']}</span></a></div></section>
+<section class="section tight"><div class="container"><div class="section-head reveal"><h2>Your first <em>steps.</em></h2></div><div class="grid g4 reveal-stagger">{st}</div></div></section>'''
 
 def legal(kind):
     def body(r):
