@@ -116,9 +116,19 @@ def mark(cls='', label=None, still=False):
             f'</svg></span></span>')
 
 # ------------------------------------------------------------------ chrome
-NAV = [('about/', 'About', 'about'), ('ministries/', 'Ministries', 'ministries'), ('encounters/', 'Encounters', 'encounters'),
-       ('listen/2-minutes/', 'Listen', 'listen'), ('teachings/', 'Teachings', 'teachings'),
-       ('spiritual-intent/', 'Spiritual Intent', 'spiritual-intent'), ('year-5787/', '5787', 'year')]
+# Four top-level items. Two of them open a short menu.
+NAV = [
+    ('about/', 'About', ['about'], None),
+    (None, 'Ministries', ['ministries', 'encounters', 'spiritual-intent', 'year'], [
+        ('ministries/', 'CMI ministry expressions', 'Four streams, one river'),
+        ('encounters/', 'Weekly encounters', 'Wednesday, Thursday, Shabbat'),
+        ('spiritual-intent/', 'Spiritual Intent', 'Books and study'),
+        ('year-5787/', 'The Year 5787', 'Tav, Shin, Pe, Zayin')]),
+    (None, 'Listen & Learn', ['listen', 'teachings'], [
+        ('listen/2-minutes/', 'The listening room', '2 Minutes Podcast and Shabbat audio'),
+        ('teachings/', 'Shabbat teachings', 'Thirteen Sabbaths celebrating the Son')]),
+    ('contact/', 'Contact', ['contact'], None),
+]
 
 def toggle():
     return ('<button class="horizon" type="button" data-experience aria-label="Experience: Auto. Switch to Day.">'
@@ -127,17 +137,27 @@ def toggle():
             '<span class="sr-only" aria-live="polite" data-experience-live></span>')
 
 def header(r, section):
-    links = ''.join(f'<a href="{r}{h}"{" aria-current=page" if section == k else ""}>{t}</a>' for h, t, k in NAV)
-    dlinks = ''.join(f'<a href="{r}{h}">{t if t != "5787" else "The Year 5787"} <small>{sub}</small></a>' for (h, t, k), sub in zip(NAV, ['Who we are', 'Four streams', 'Weekly', 'Podcast', 'Shabbat library', 'Books', 'This year']))
+    chev = '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>'
+    top, drawer = [], [f'<a class="d-link" href="{r or "./"}">Home</a>']
+    for i, (href, label, keys, items) in enumerate(NAV):
+        cur = ' aria-current="page"' if section in keys else ''
+        if not items:
+            top.append(f'<a class="nav-item" href="{r}{href}"{cur}>{label}</a>')
+            drawer.append(f'<a class="d-link" href="{r}{href}"{cur}>{label}</a>')
+            continue
+        menu = ''.join(f'<a href="{r}{h}"><b>{t}</b><small>{d}</small></a>' for h, t, d in items)
+        top.append(f'<div class="nav-group" data-nav-group><button class="nav-item" type="button" aria-expanded="false" aria-controls="nav-m{i}"{" data-current" if cur else ""}>{label}{chev}</button>'
+                   f'<div class="nav-menu" id="nav-m{i}">{menu}</div></div>')
+        sub = ''.join(f'<a href="{r}{h}">{t}<small>{d}</small></a>' for h, t, d in items)
+        drawer.append(f'<details class="d-group"{" open" if cur else ""}><summary>{label}{chev}</summary><div class="d-sub">{sub}</div></details>')
     return f'''<a class="skip" href="#main">Skip to content</a>
 <header class="site-header"><div class="container"><div class="bar">
 <a class="brand" href="{r or './'}" aria-label="Believers Country — home">{mark(still=True)}<span class="brand-words"><strong><span>Believers</span><span>Country</span></strong><small>CMI</small></span></a>
-<nav class="primary-nav" aria-label="Main">{links}</nav>
+<nav class="primary-nav" aria-label="Main">{''.join(top)}</nav>
 <div class="header-actions">{toggle()}<a class="button gold join" href="{r}encounters/">Join us {I['arrow']}</a>
 <button class="menu-button" id="menu-button" type="button" aria-expanded="false" aria-controls="drawer" aria-label="Open menu"><i></i><i></i></button></div>
 </div></div></header>
-<div class="drawer" id="drawer" hidden><nav aria-label="Menu"><a href="{r or './'}">Home <small>Welcome</small></a>{dlinks}<a href="{r}contact/">Contact <small>Connect</small></a></nav>
-<div class="drawer-groups"><a class="button wa" href="{LINKS['shabbat']}" target="_blank" rel="noopener">{I['whatsapp']} Shabbat Service group</a><a class="button wa" href="{LINKS['school']}" target="_blank" rel="noopener">{I['whatsapp']} School of Scriptures group</a><a class="button wa" href="{LINKS['ministering']}" target="_blank" rel="noopener">{I['whatsapp']} Ministering to the LORD group</a><a class="button ghost" href="{LINKS['youtube']}" target="_blank" rel="noopener">{I['youtube']} Watch on YouTube</a></div></div>'''
+<div class="drawer" id="drawer" hidden><nav aria-label="Menu">{''.join(drawer)}</nav></div>'''
 
 def footer(r):
     return f'''<footer class="footer"><div class="container">

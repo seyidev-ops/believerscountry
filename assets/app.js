@@ -99,8 +99,22 @@
     menuBtn.addEventListener('click', () => set(drawer.hidden));
     $$('a', drawer).forEach(a => a.addEventListener('click', () => set(false)));
     addEventListener('keydown', e => { if (e.key === 'Escape' && !drawer.hidden) { set(false); menuBtn.focus(); } });
-    addEventListener('resize', () => innerWidth > 1100 && !drawer.hidden && set(false));
+    addEventListener('resize', () => innerWidth > 920 && !drawer.hidden && set(false));
   }
+
+  /* ---------------- desktop menus ---------------- */
+  const groups = $$('[data-nav-group]');
+  const shut = except => groups.forEach(g => { if (g !== except) { g.classList.remove('open'); $('button', g).setAttribute('aria-expanded', 'false'); } });
+  const hover = matchMedia('(hover: hover)').matches;
+  groups.forEach(g => {
+    const b = $('button', g);
+    const set = o => { g.classList.toggle('open', o); b.setAttribute('aria-expanded', String(o)); };
+    b.addEventListener('click', e => { e.stopPropagation(); const o = !g.classList.contains('open'); shut(g); set(o); });
+    if (hover) { let t; g.addEventListener('mouseenter', () => { clearTimeout(t); shut(g); set(true); }); g.addEventListener('mouseleave', () => { t = setTimeout(() => set(false), 180); }); }
+    g.addEventListener('keydown', e => { if (e.key === 'Escape') { set(false); b.focus(); } });
+    g.addEventListener('focusout', e => { if (!g.contains(e.relatedTarget)) set(false); });
+  });
+  document.addEventListener('click', e => { if (!e.target.closest('[data-nav-group]')) shut(); });
 
   /* ---------------- reveal, glow, ripple ---------------- */
   const targets = $$('.reveal,.reveal-stagger');
