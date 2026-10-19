@@ -1,6 +1,6 @@
 # Believers Country — CMI website
 
-Live at https://seyidev-ops.github.io/cmi/ (GitHub Pages, `main` branch, repository root).
+Live at https://believerscountry.org/ (GitHub Pages, `main` branch, repository root; custom domain set in `CNAME`).
 
 ## Design
 "A new heaven and a new earth": **Day** is the new earth at first light (pearl sky, living gold, the river of life); **Night** is the new heaven (sapphire sky, stars, gold that does not go out). The horizon toggle in the header cycles Day → Night → Auto; Auto follows the device setting. The CMI mark levitates, turns at intervals, and its flame burns in animated gold. All motion respects *reduce motion*.

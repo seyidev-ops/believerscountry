@@ -9,7 +9,7 @@ import json, re, os, html, datetime as dt
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-SITE_URL = 'https://seyidev-ops.github.io/cmi/'
+SITE_URL = 'https://believerscountry.org/'
 WAT = dt.timezone(dt.timedelta(hours=1))
 NOW = dt.datetime.now(WAT)
 # The day runs 6 PM to 6 PM: after 6 PM the next date's day has begun.
@@ -818,7 +818,7 @@ def main():
     page('contact/', 'Contact', 'Connect with Believers Country through our WhatsApp communities and YouTube channel.', contact)
     legal('privacy'); legal('terms')
     # legacy route kept as a redirect
-    (ROOT / 'ministries/country-commonwealth/index.html').write_text('<!DOCTYPE html><meta charset="utf-8"><title>Commonwealth | Believers Country</title><meta name="robots" content="noindex"><meta http-equiv="refresh" content="0; url=../commonwealth/"><link rel="canonical" href="https://seyidev-ops.github.io/cmi/ministries/commonwealth/"><p>Moved to <a href="../commonwealth/">Commonwealth</a>.</p>')
+    (ROOT / 'ministries/country-commonwealth/index.html').write_text('<!DOCTYPE html><meta charset="utf-8"><title>Commonwealth | Believers Country</title><meta name="robots" content="noindex"><meta http-equiv="refresh" content="0; url=../commonwealth/"><link rel="canonical" href="https://believerscountry.org/ministries/commonwealth/"><p>Moved to <a href="../commonwealth/">Commonwealth</a>.</p>')
     def prio(p):
         if p == '': return '1.0', 'daily'
         if p in ('listen/2-minutes/', 'encounters/', 'teachings/'): return '0.9', 'daily' if p.startswith('listen') else 'weekly'
@@ -830,7 +830,7 @@ def main():
         f'<url><loc>{SITE_URL}{p}</loc><lastmod>{today}</lastmod><changefreq>{prio(p)[1]}</changefreq><priority>{prio(p)[0]}</priority></url>\n' for p in PAGES) + '</urlset>\n'
     (ROOT / 'sitemap.xml').write_text(sitemap)
     (ROOT / 'robots.txt').write_text(f'User-agent: *\nAllow: /\nSitemap: {SITE_URL}sitemap.xml\n')
-    page('', 'Page not found', 'This page could not be found.', lambda r: page_hero(r, [(None, 'Not found')], 'Page not found', 'This path has <em>no road yet.</em>', 'The page you were looking for has moved or does not exist. Start again from home, or step into one of the gatherings.') + next_steps(r, [('', 'Home', 'Return to the beginning.'), ('encounters/', 'Weekly encounters', 'Join us this week.'), ('listen/2-minutes/', 'Listen', 'Today’s 2 minutes.')]), extra_head='<base href="/cmi/">', out_file='404.html')
+    page('', 'Page not found', 'This page could not be found.', lambda r: page_hero(r, [(None, 'Not found')], 'Page not found', 'This path has <em>no road yet.</em>', 'The page you were looking for has moved or does not exist. Start again from home, or step into one of the gatherings.') + next_steps(r, [('', 'Home', 'Return to the beginning.'), ('encounters/', 'Weekly encounters', 'Join us this week.'), ('listen/2-minutes/', 'Listen', 'Today’s 2 minutes.')]), extra_head='<base href="/">', out_file='404.html')
     print(f'Built {len(PAGES)} pages · sacred day {SACRED} · today’s episode: {episode_for(SACRED)["title"]}')
 
 if __name__ == '__main__':
