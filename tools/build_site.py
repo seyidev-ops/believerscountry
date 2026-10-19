@@ -53,7 +53,9 @@ for s in SERVICES:
     s['iso'] = dt.datetime.strptime(s['date'], '%d %B %Y').date().isoformat()
 
 EPISODES = [
-    dict(slug='the-measuring-line', title='The Measuring Line', date='2026-10-19', seconds=90, label='1:30',
+    dict(slug='believe-on-him-part-1', title='Believe On Him (Part 1)', date='2026-10-19', seconds=87, label='1:27',
+         word='Believe on Him', blurb='The first of a short series on believing on the Son: what it means to rest your whole weight on Him.'),
+    dict(slug='the-measuring-line', title='The Measuring Line', date='2026-10-18', seconds=90, label='1:30',
          word='The measuring line', blurb='A short word from Believers Country on the measuring line. Press play, then carry it with you through the day.'),
     dict(slug='no-separation', title='No Separation', date='2026-10-17', seconds=82, label='1:22',
          word='Nothing stands between', blurb='Nothing created stands between the believer and the love of God in Christ. A short word on union that cannot be broken.'),
@@ -177,12 +179,41 @@ def footer(r):
 <div class="legal"><span>© <span data-year>2026</span> Country Ministries International · Believers Country. All rights reserved.</span><nav aria-label="Legal"><a href="{r}privacy/">Privacy Policy</a><a href="{r}terms/">Terms of Use</a><span>Times in WAT (Africa/Lagos)</span></nav></div>
 </div></footer>'''
 
+ORG = {'@type': ['Organization', 'Church'], '@id': SITE_URL + '#org', 'name': 'Country Ministries International', 'alternateName': ['Believers Country', 'CMI'],
+       'url': SITE_URL, 'logo': SITE_URL + 'assets/favicon-512.png', 'image': SITE_URL + 'assets/og-image.png', 'slogan': 'Living Eternal Life Abundantly.',
+       'description': 'Believers Country is the communal expression of Country Ministries International: a people belonging to the Father, a life received in the Son, a country expressed through His Spirit.',
+       'address': {'@type': 'PostalAddress', 'addressCountry': 'NG'}, 'sameAs': [LINKS['youtube']]}
+CRUMB_NAMES = {'about': 'About', 'ministries': 'CMI ministry expressions', 'encounters': 'Weekly encounters', 'listen': 'Listen', '2-minutes': 'The listening room',
+               'teachings': 'Shabbat teachings', 'spiritual-intent': 'Spiritual Intent', 'books': 'Money Under God', 'year-5787': 'The Year 5787',
+               'contact': 'Contact', 'privacy': 'Privacy Policy', 'terms': 'Terms of Use'}
+OG_TYPE = {'teachings': 'article', 'listen': 'article'}
+
 def page(path, title, desc, body, section='', jsonld=None, extra_head='', out_file=None):
     depth = path.count('/') if path else 0
     r = '../' * depth
     full_title = f'{title} | Believers Country' if title != 'Believers Country' else 'Believers Country — Living Eternal Life Abundantly'
     url = SITE_URL + path
-    ld = f'<script type="application/ld+json">{json.dumps(jsonld, ensure_ascii=False)}</script>' if jsonld else ''
+    graph = []
+    if path == '':
+        graph += [ORG, {'@type': 'WebSite', '@id': SITE_URL + '#site', 'name': 'Believers Country', 'alternateName': 'Country Ministries International',
+                        'url': SITE_URL, 'inLanguage': 'en', 'publisher': {'@id': SITE_URL + '#org'}}]
+    elif not out_file:
+        parts = [x for x in path.strip('/').split('/') if x]
+        items = [{'@type': 'ListItem', 'position': 1, 'name': 'Home', 'item': SITE_URL}]
+        for i in range(len(parts)):
+            sub = '/'.join(parts[:i + 1]) + '/'
+            if sub == 'listen/':
+                continue
+            name = title if i == len(parts) - 1 else CRUMB_NAMES.get(parts[i], parts[i])
+            items.append({'@type': 'ListItem', 'position': len(items) + 1, 'name': name, 'item': SITE_URL + sub})
+        graph.append({'@type': 'BreadcrumbList', 'itemListElement': items})
+        graph.append({'@type': 'WebPage', '@id': url, 'url': url, 'name': full_title, 'description': desc, 'inLanguage': 'en',
+                      'isPartOf': {'@type': 'WebSite', '@id': SITE_URL + '#site', 'name': 'Believers Country', 'url': SITE_URL}, 'publisher': {'@type': 'Organization', '@id': SITE_URL + '#org', 'name': 'Country Ministries International'}})
+    if jsonld:
+        graph += jsonld if isinstance(jsonld, list) else [jsonld]
+    for g in graph: g.pop('@context', None)
+    ld = f'<script type="application/ld+json">{json.dumps({"@context": "https://schema.org", "@graph": graph}, ensure_ascii=False)}</script>' if graph else ''
+    og_type = OG_TYPE.get(path.split('/')[0], 'website') if path.count('/') > 1 else 'website'
     eps = json.dumps([{k: ep[k] for k in ('slug', 'title', 'date', 'audio', 'path', 'seconds', 'label')} for ep in EPISODES])
     doc = f'''<!DOCTYPE html>
 <html lang="en" class="no-js" data-mode="system" data-theme="day" data-root="{r}">
@@ -193,7 +224,12 @@ def page(path, title, desc, body, section='', jsonld=None, extra_head='', out_fi
 <meta name="description" content="{e(desc)}">
 <meta name="theme-color" content="#f7f2e6">
 <link rel="canonical" href="{url}">
-<meta property="og:type" content="website"><meta property="og:site_name" content="Believers Country"><meta property="og:title" content="{e(full_title)}"><meta property="og:description" content="{e(desc)}"><meta property="og:url" content="{url}"><meta property="og:image" content="{SITE_URL}assets/og-image.png"><meta name="twitter:card" content="summary_large_image">
+<meta name="robots" content="{'noindex' if out_file else 'index, follow, max-image-preview:large, max-snippet:-1'}">
+<meta name="author" content="Country Ministries International">
+<meta property="og:type" content="{og_type}"><meta property="og:site_name" content="Believers Country"><meta property="og:locale" content="en_NG"><meta property="og:title" content="{e(full_title)}"><meta property="og:description" content="{e(desc)}"><meta property="og:url" content="{url}">
+<meta property="og:image" content="{SITE_URL}assets/og-image.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Believers Country — Country Ministries International">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="{e(full_title)}"><meta name="twitter:description" content="{e(desc)}"><meta name="twitter:image" content="{SITE_URL}assets/og-image.png">
+<link rel="sitemap" type="application/xml" href="{SITE_URL}sitemap.xml">
 <script>(function(){{var d=document.documentElement,m='system';try{{m=localStorage.getItem('bc-experience-v3')||localStorage.getItem('bc-experience-v2')||'system'}}catch(e){{}}if(['day','night','system'].indexOf(m)<0)m='system';d.dataset.mode=m;d.dataset.theme=m==='system'?(matchMedia('(prefers-color-scheme: dark)').matches?'night':'day'):m}})()</script>
 <link rel="icon" href="{r}assets/favicon-day.svg" type="image/svg+xml" data-favicon="{r}assets/favicon-">
 <link rel="icon" href="{r}assets/favicon-cmi.png" type="image/png" sizes="192x192" data-favicon-png="{r}assets/favicon-cmi">
@@ -266,7 +302,7 @@ def player(r, ep, today=False, feature=False, tools=True):
             f'<div class="player-time"><span class="t-cur">0:00</span><span class="t-total">{ep["label"]}</span></div>{t}</div></div>')
 
 def ep_card(r, ep):
-    ax = {'the-measuring-line': '60%', 'no-separation': '25%', 'proof-that-you-know-god': '70%', 'what-is-your-advantage-as-a-believer': '45%', 'relationship-with-the-father': '80%'}[ep['slug']]
+    ax = {'believe-on-him-part-1': '35%', 'the-measuring-line': '60%', 'no-separation': '25%', 'proof-that-you-know-god': '70%', 'what-is-your-advantage-as-a-believer': '45%', 'relationship-with-the-father': '80%'}[ep['slug']]
     return f'''<article class="card ep" style="--ax:{ax}"><div class="art" aria-hidden="true"><span class="rings"></span><span class="art-dur">{ep['label']}</span><span class="art-word">{e(ep['word'])}</span></div>
 <div class="kicker">{ep['pretty']} <span class="badge latest" data-today-flag="{ep['slug']}" hidden>Today</span></div>
 <h3><a class="card-link" href="{r}{ep['path']}">{e(ep['title'])}</a></h3><p>{e(ep['blurb'])}</p>{player(r, ep)}</article>'''
@@ -536,7 +572,15 @@ def encounter_page(x, idx):
 <aside class="aside reveal" id="join"><div class="panel"><div class="letter-big hebrew" aria-hidden="true">{x['letter']}</div><div class="facts small" style="margin-top:14px"><div><span>When</span><b>Every {x['day']} · {x['time']}</b></div><div><span>Sacred time</span><b>{x['heb']}</b></div><div><span>Next</span><b data-next="{x['key']}">Every {x['day']}</b></div><div><span>Bring</span><b>{x['bring']}</b></div></div></div>
 <a class="button wa" href="{x['link']}" target="_blank" rel="noopener">{I['whatsapp']} Join the {x['title']} group</a><button class="button ghost" type="button" data-ics="{x['key']}">{I['cal']} Add to calendar</button></aside></div></section>
 {next_steps(r, [(f"encounters/{o['slug']}/", o['title'], f"Every {o['day']} · {o['time']} WAT") for o in ENCOUNTERS if o is not x] + [('teachings/', 'Shabbat teachings', 'Revisit the Sabbaths of this quarter.')], 'Other <em>encounters.</em>')}'''
-    page(f"encounters/{x['slug']}/", x['title'], f"{x['title']} — every {x['day']} at {x['time']} WAT. {x['short']}", body, 'encounters')
+    nxt = SACRED + dt.timedelta(days=(({'wed': 2, 'thu': 3, 'sat': 5}[x['key']] - SACRED.weekday()) % 7))
+    hh = 18 if x['key'] != 'sat' else 8
+    ev = {'@type': 'Event', 'name': f"{x['title']} · Believers Country", 'description': x['intro'], 'url': SITE_URL + f"encounters/{x['slug']}/",
+          'startDate': f"{nxt.isoformat()}T{hh:02d}:00:00+01:00", 'endDate': f"{nxt.isoformat()}T{hh + 2:02d}:00:00+01:00",
+          'eventAttendanceMode': 'https://schema.org/OnlineEventAttendanceMode', 'eventStatus': 'https://schema.org/EventScheduled',
+          'eventSchedule': {'@type': 'Schedule', 'repeatFrequency': 'P1W', 'byDay': f"https://schema.org/{x['day']}", 'startTime': f'{hh:02d}:00', 'endTime': f'{hh + 2:02d}:00', 'scheduleTimezone': 'Africa/Lagos'},
+          'location': {'@type': 'VirtualLocation', 'url': x['link']}, 'isAccessibleForFree': True,
+          'organizer': {'@type': 'Organization', 'name': 'Country Ministries International', 'url': SITE_URL}, 'image': SITE_URL + 'assets/og-image.png'}
+    page(f"encounters/{x['slug']}/", x['title'], f"{x['title']} — every {x['day']} at {x['time']} WAT. {x['short']}", body, 'encounters', ev)
 
 # ------------------------------------------------------------------ LISTEN
 def archive_row(r, x, kind):
@@ -588,8 +632,10 @@ def episode_page(ep, idx):
 {pager}</div></section>
 {next_steps(r, [('listen/2-minutes/', 'All episodes', 'The full listening room.'), ('teachings/', 'Shabbat teachings', 'Thirteen Sabbaths celebrating the Son.'), ('encounters/', 'Gather with us', 'Join a weekly encounter.')])}'''
     page(ep['path'], f"{ep['title']} · 2 Minutes Podcast", ep['blurb'], body, 'listen',
-         {'@context': 'https://schema.org', '@type': 'PodcastEpisode', 'name': ep['title'], 'description': ep['blurb'], 'duration': f"PT{ep['seconds']}S",
-          'associatedMedia': {'@type': 'MediaObject', 'contentUrl': SITE_URL + ep['audio']}, 'partOfSeries': {'@type': 'PodcastSeries', 'name': '2 Minutes Podcast'}})
+         {'@type': 'PodcastEpisode', 'name': ep['title'], 'description': ep['blurb'], 'datePublished': ep['date'], 'timeRequired': f"PT{ep['seconds']}S", 'url': SITE_URL + ep['path'], 'inLanguage': 'en',
+          'associatedMedia': {'@type': 'AudioObject', 'contentUrl': SITE_URL + ep['audio'], 'encodingFormat': 'audio/mpeg', 'duration': f"PT{ep['seconds']}S"},
+          'partOfSeries': {'@type': 'PodcastSeries', 'name': '2 Minutes Podcast', 'url': SITE_URL + 'listen/2-minutes/'},
+          'publisher': {'@type': 'Organization', 'name': 'Country Ministries International'}})
 
 # ------------------------------------------------------------------ TEACHINGS
 def teachings(r):
@@ -630,7 +676,12 @@ def teaching_page(s, idx):
 {share_box(s['title'], r + 'teachings/' + s['slug'] + '/')}
 <a class="button wa" href="{LINKS['shabbat']}" target="_blank" rel="noopener">{I['whatsapp']} Join Shabbat Service</a></aside></div></section>'''
     page(f"teachings/{s['slug']}/", f"{s['title']} · Shabbat {s['n']}", f"{s['title']} — Shabbat service {s['n']} of 13, {s['date']}. {s['focus']}.", body, 'teachings',
-         {'@context': 'https://schema.org', '@type': 'Article', 'headline': s['title'], 'datePublished': s['iso'], 'author': {'@type': 'Organization', 'name': 'Country Ministries International'}})
+         dict({'@type': 'Article', 'headline': s['title'], 'description': f"{s['kicker']}. {s['focus']}.", 'datePublished': s['iso'], 'inLanguage': 'en',
+               'image': SITE_URL + 'assets/og-image.png', 'about': 'Jesus Christ', 'keywords': f"Shabbat, {s['title']}, {s['focus']}, Believers Country, CMI",
+               'author': {'@type': 'Organization', 'name': 'Country Ministries International', 'url': SITE_URL},
+               'publisher': {'@type': 'Organization', 'name': 'Country Ministries International', 'logo': {'@type': 'ImageObject', 'url': SITE_URL + 'assets/favicon-512.png'}},
+               'mainEntityOfPage': SITE_URL + f"teachings/{s['slug']}/"},
+              **({'audio': {'@type': 'AudioObject', 'name': s['title'], 'contentUrl': SITE_URL + s['audio'], 'encodingFormat': 'audio/mpeg', 'duration': f"PT{s['seconds']}S", 'uploadDate': s['iso']}} if s.get('audio') else {})))
 
 # ------------------------------------------------------------------ SPIRITUAL INTENT
 BOOKS = [('scriptural-wealth', 'Scriptural Wealth', 'Wealth and faithful stewardship under Christ.'), ('how-to-receive-from-god', 'How to Receive From God', 'Receiving from God and understanding the Source.'),
@@ -749,14 +800,15 @@ def legal(kind):
 # ------------------------------------------------------------------ build
 def main():
     page('', 'Believers Country', 'Believers Country — Country Ministries International. Weekly encounters, Shabbat teachings celebrating the Son, the 2 Minutes Podcast and the Spiritual Intent books.', home, 'home',
-         {'@context': 'https://schema.org', '@type': 'Organization', 'name': 'Believers Country', 'alternateName': 'Country Ministries International', 'url': SITE_URL, 'sameAs': [LINKS['youtube']], 'slogan': 'Living Eternal Life Abundantly.'})
+         None)
     page('about/', 'About', 'Who we are: a people belonging to the Father, a life received in the Son, a country expressed through His Spirit.', about, 'about')
     page('ministries/', 'Ministries', 'The four streams of CMI: Believers Country, School of Scriptures, Commonwealth and Country Vanguard.', ministries, 'ministries')
     for i, s in enumerate(STREAMS): stream_page(s, i)
     page('encounters/', 'Weekly encounters', 'School of Scriptures on Wednesday, Ministering to the LORD on Thursday and Shabbat Service on Saturday — join on WhatsApp.', encounters, 'encounters')
     for i, x in enumerate(ENCOUNTERS): encounter_page(x, i)
     page('listen/2-minutes/', '2 Minutes Podcast', 'Short original messages from Believers Country. Listen today, download or share.', listen, 'listen',
-         {'@context': 'https://schema.org', '@type': 'PodcastSeries', 'name': '2 Minutes Podcast', 'url': SITE_URL + 'listen/2-minutes/', 'author': {'@type': 'Organization', 'name': 'Believers Country'}})
+         {'@type': 'PodcastSeries', 'name': '2 Minutes Podcast', 'description': 'Short original messages from Believers Country, one for each day.', 'url': SITE_URL + 'listen/2-minutes/', 'inLanguage': 'en',
+          'image': SITE_URL + 'assets/og-image.png', 'author': {'@type': 'Organization', 'name': 'Country Ministries International'}})
     for i, ep in enumerate(EPISODES): episode_page(ep, i)
     page('teachings/', 'Shabbat teachings', 'Celebrating the Son — thirteen Shabbat teachings for the first quarter of 5787.', teachings, 'teachings')
     for i, s in enumerate(SERVICES): teaching_page(s, i)
@@ -766,11 +818,19 @@ def main():
     page('contact/', 'Contact', 'Connect with Believers Country through our WhatsApp communities and YouTube channel.', contact)
     legal('privacy'); legal('terms')
     # legacy route kept as a redirect
-    (ROOT / 'ministries/country-commonwealth/index.html').write_text('<!DOCTYPE html><meta charset="utf-8"><title>Commonwealth | Believers Country</title><meta http-equiv="refresh" content="0; url=../commonwealth/"><link rel="canonical" href="../commonwealth/"><p>Moved to <a href="../commonwealth/">Commonwealth</a>.</p>')
-    sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + ''.join(f'<url><loc>{SITE_URL}{p}</loc></url>' for p in PAGES) + '</urlset>\n'
+    (ROOT / 'ministries/country-commonwealth/index.html').write_text('<!DOCTYPE html><meta charset="utf-8"><title>Commonwealth | Believers Country</title><meta name="robots" content="noindex"><meta http-equiv="refresh" content="0; url=../commonwealth/"><link rel="canonical" href="https://seyidev-ops.github.io/cmi/ministries/commonwealth/"><p>Moved to <a href="../commonwealth/">Commonwealth</a>.</p>')
+    def prio(p):
+        if p == '': return '1.0', 'daily'
+        if p in ('listen/2-minutes/', 'encounters/', 'teachings/'): return '0.9', 'daily' if p.startswith('listen') else 'weekly'
+        if p.count('/') == 1: return '0.8', 'monthly'
+        if p.startswith('privacy') or p.startswith('terms'): return '0.3', 'yearly'
+        return '0.7', 'monthly'
+    today = NOW.date().isoformat()
+    sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + ''.join(
+        f'<url><loc>{SITE_URL}{p}</loc><lastmod>{today}</lastmod><changefreq>{prio(p)[1]}</changefreq><priority>{prio(p)[0]}</priority></url>\n' for p in PAGES) + '</urlset>\n'
     (ROOT / 'sitemap.xml').write_text(sitemap)
     (ROOT / 'robots.txt').write_text(f'User-agent: *\nAllow: /\nSitemap: {SITE_URL}sitemap.xml\n')
-    page('', 'Page not found', 'This page could not be found.', lambda r: page_hero(r, [(None, 'Not found')], 'Page not found', 'This path has <em>no road yet.</em>', 'The page you were looking for has moved or does not exist. Start again from home, or step into one of the gatherings.') + next_steps(r, [('', 'Home', 'Return to the beginning.'), ('encounters/', 'Weekly encounters', 'Join us this week.'), ('listen/2-minutes/', 'Listen', 'Today’s 2 minutes.')]), extra_head='<base href="/cmi/"><meta name="robots" content="noindex">', out_file='404.html')
+    page('', 'Page not found', 'This page could not be found.', lambda r: page_hero(r, [(None, 'Not found')], 'Page not found', 'This path has <em>no road yet.</em>', 'The page you were looking for has moved or does not exist. Start again from home, or step into one of the gatherings.') + next_steps(r, [('', 'Home', 'Return to the beginning.'), ('encounters/', 'Weekly encounters', 'Join us this week.'), ('listen/2-minutes/', 'Listen', 'Today’s 2 minutes.')]), extra_head='<base href="/cmi/">', out_file='404.html')
     print(f'Built {len(PAGES)} pages · sacred day {SACRED} · today’s episode: {episode_for(SACRED)["title"]}')
 
 if __name__ == '__main__':
