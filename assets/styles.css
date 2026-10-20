@@ -579,3 +579,24 @@ ul.clean{list-style:none;padding:0;margin:0}
 .give-note{margin:16px 0}
 @media (max-width:860px){.give-grid{grid-template-columns:minmax(0,1fr)}}
 @media (max-width:520px){.acct{grid-template-columns:40px minmax(0,1fr) auto;gap:10px 12px}.acct .cur{width:40px;height:40px}.acct-n{grid-column:2/3;grid-row:2}.acct .chip{grid-row:1/3;grid-column:3}}
+
+/* contact portrait */
+.hero-split{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:clamp(30px,5vw,70px);align-items:center}
+.portrait{margin:0;display:flex;flex-direction:column;align-items:center;justify-self:center;width:min(100%,400px)}
+.portrait-float{width:100%;animation:levitate 7s ease-in-out infinite;will-change:transform}
+.portrait-frame{position:relative;padding:12px;border-radius:30px;background:linear-gradient(145deg,var(--gold3),var(--gold2) 35%,var(--gold) 65%,var(--gold2));box-shadow:0 40px 80px -30px rgba(0,0,0,.45),0 0 70px -10px var(--glow)}
+.portrait-frame::before{content:'';position:absolute;inset:-18px;border-radius:44px;border:1px solid var(--line2);pointer-events:none}
+.portrait-frame::after{content:'';position:absolute;inset:-34px;border-radius:58px;background:radial-gradient(closest-side,var(--glow),transparent);z-index:-1;animation:breathe 7s ease-in-out infinite}
+.portrait-mat{padding:10px;border-radius:20px;background:var(--surface-solid)}
+.portrait-mat img{display:block;width:100%;height:auto;border-radius:12px}
+.portrait .corner{position:absolute;width:26px;height:26px;border:2px solid var(--surface-solid);opacity:.85}
+.portrait .tl{top:20px;left:20px;border-right:0;border-bottom:0;border-radius:10px 0 0 0}
+.portrait .tr{top:20px;right:20px;border-left:0;border-bottom:0;border-radius:0 10px 0 0}
+.portrait .bl{bottom:20px;left:20px;border-right:0;border-top:0;border-radius:0 0 0 10px}
+.portrait .br{bottom:20px;right:20px;border-left:0;border-top:0;border-radius:0 0 10px 0}
+.portrait figcaption{margin-top:34px;text-align:center}
+.portrait figcaption b{display:block;font:600 italic clamp(24px,2.6vw,30px)/1.1 var(--font-display);color:var(--ink)}
+@media (max-width:860px){
+  .hero-split{grid-template-columns:minmax(0,1fr);gap:46px}
+  .portrait{width:min(86%,360px)}
+}

@@ -275,14 +275,24 @@ def crumbs(r, trail):
 CRUMB = {'ministries/': 'CMI ministry expressions', 'encounters/': 'Weekly encounters', 'listen/2-minutes/': 'The listening room',
          'teachings/': 'Shabbat teachings', 'spiritual-intent/': 'Spiritual Intent'}
 
-def page_hero(r, trail, eyebrow, h1, lead, chips=None, side=True):
+def page_hero(r, trail, eyebrow, h1, lead, chips=None, side=True, aside=''):
     # The page's label lives in the breadcrumb (Home / Weekly encounters), not repeated as a dashed line above the title.
     trail = [(h, CRUMB.get(h, t)) for h, t in trail[:-1]] + [(None, eyebrow)]
     c = ''
     if chips:
         c = '<div class="on-page">' + ''.join(f'<a class="chip" href="{h}">{t}</a>' for h, t in chips) + '</div>'
+    if aside:
+        return f'''<section class="page-hero with-aside"><div class="container hero-split"><div class="reveal">{crumbs(r, trail)}<h1>{h1}</h1><p class="lead">{lead}</p>{c}</div>{aside}</div></section>'''
     sm = f'<div class="side-mark" aria-hidden="true">{mark()}</div>' if side else ''
     return f'''<section class="page-hero"><div class="container reveal">{crumbs(r, trail)}<h1>{h1}</h1><p class="lead">{lead}</p>{c}</div>{sm}</section>'''
+
+def portrait(r):
+    # The photograph is shown whole and unaltered; only the frame around it is designed.
+    return (f'<figure class="portrait reveal"><div class="portrait-float"><div class="portrait-frame"><div class="portrait-mat">'
+            f'<picture><source srcset="{r}assets/people/seyi-and-shirley-ashiru.webp" type="image/webp">'
+            f'<img src="{r}assets/people/seyi-and-shirley-ashiru.png" width="1086" height="1448" alt="Seyi and Shirley Ashiru" decoding="async" fetchpriority="high"></picture>'
+            f'</div><span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span></div></div>'
+            f'<figcaption><b>Seyi &amp; Shirley Ashiru</b></figcaption></figure>')
 
 def share_box(title, url):
     return (f'<div class="share" data-share-title="{e(title)}" data-share-url="{url}"><button class="chip" type="button" data-share-toggle aria-expanded="false">{I["share"]} Share</button>'
@@ -751,7 +761,7 @@ def contact(r):
     st = ''.join(f'<article class="card step-card"><span class="num">0{i+1}</span><h3>{a}</h3><p>{b}</p></article>' for i, (a, b) in enumerate(steps))
     return page_hero(r, [(None, 'Contact')], 'Connect with us', 'We would love to <em>welcome you.</em>',
                      'The quickest way to reach Believers Country is through our WhatsApp communities. Join the one that fits your week, introduce yourself, and someone will respond.',
-                     [('#gather', 'Join a gathering'), ('#give', 'Give · Partner · Support'), ('#steps', 'First steps')]) + f'''
+                     [('#gather', 'Join a gathering'), ('#give', 'Give · Partner · Support'), ('#steps', 'First steps')], aside=portrait(r)) + f'''
 <section class="section tight" id="gather" style="padding-top:0"><div class="container"><div class="section-head reveal"><div><h2>Join a <em>gathering.</em></h2><p class="lead">Each weekly encounter has its own WhatsApp community, where joining details and notices are shared.</p></div></div>
 <div class="grid g3 reveal-stagger">{cards}</div>
 <a class="card yt-band reveal" href="{LINKS['youtube']}" target="_blank" rel="noopener"><span class="ico">{I['youtube']}</span><span><b>Watch on YouTube</b><small>Past gatherings and teachings · @believerscountry</small></span><span class="circle">{I['up']}</span></a></div></section>
