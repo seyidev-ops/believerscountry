@@ -600,3 +600,9 @@ ul.clean{list-style:none;padding:0;margin:0}
   .hero-split{grid-template-columns:minmax(0,1fr);gap:46px}
   .portrait{width:min(86%,360px)}
 }
+
+.bands{margin-top:18px}
+.bands .yt-band{margin-top:0}
+.mail-band .ico{background:var(--btn);color:var(--btnInk)}
+.yt-band small{display:block;line-height:1.5}
+@media (max-width:520px){.yt-band .circle{display:none}.yt-band{gap:14px}}

@@ -15,6 +15,7 @@ NOW = dt.datetime.now(WAT)
 # The day runs 6 PM to 6 PM: after 6 PM the next date's day has begun.
 SACRED = (NOW + dt.timedelta(days=1)).date() if NOW.hour >= 18 else NOW.date()
 
+EMAIL = 'countryministriesinternational@gmail.com'
 LINKS = {
     'youtube': 'https://www.youtube.com/@believerscountry',
     'ministering': 'https://chat.whatsapp.com/B9DSqidV9SA0iyL6UemfM1',
@@ -173,7 +174,7 @@ def footer(r):
 <div class="footer-grid">
 <div><a class="footer-brand" href="{r or './'}">{mark()}<span class="brand-words"><strong><span>Believers</span><span>Country</span></strong><small>CMI</small></span></a>
 <p>A people belonging to the Father. A life received in the Son. A country expressed through His Spirit.</p>
-<div class="socials"><a href="{LINKS['youtube']}" target="_blank" rel="noopener" aria-label="Believers Country on YouTube">{I['youtube']}</a><a href="{LINKS['shabbat']}" target="_blank" rel="noopener" aria-label="Join the Shabbat Service WhatsApp group">{I['whatsapp']}</a><a href="{r}contact/" aria-label="Contact Believers Country">{I['mail']}</a></div></div>
+<div class="socials"><a href="{LINKS['youtube']}" target="_blank" rel="noopener" aria-label="Believers Country on YouTube">{I['youtube']}</a><a href="{LINKS['shabbat']}" target="_blank" rel="noopener" aria-label="Join the Shabbat Service WhatsApp group">{I['whatsapp']}</a><a href="mailto:{EMAIL}" aria-label="Email Country Ministries International">{I['mail']}</a></div></div>
 <div class="footer-col"><h4>Discover</h4><a href="{r}about/">Who we are</a><a href="{r}ministries/">Four ministry streams</a><a href="{r}year-5787/">The Year 5787</a><a href="{r}contact/">Contact</a><a href="{r}contact/#give">Give · Partner</a></div>
 <div class="footer-col"><h4>Gather</h4><a href="{r}encounters/school-of-scriptures/">School of Scriptures · Wed</a><a href="{r}encounters/ministering-to-the-lord/">Ministering to the LORD · Thu</a><a href="{r}encounters/shabbat-service/">Shabbat Service · Sat</a></div>
 <div class="footer-col"><h4>Listen &amp; read</h4><a href="{r}listen/2-minutes/">2 Minutes Podcast</a><a href="{r}teachings/">Shabbat teachings</a><a href="{r}spiritual-intent/">Spiritual Intent</a><a href="{LINKS['youtube']}" target="_blank" rel="noopener">YouTube channel</a></div>
@@ -184,7 +185,7 @@ def footer(r):
 ORG = {'@type': ['Organization', 'Church'], '@id': SITE_URL + '#org', 'name': 'Country Ministries International', 'alternateName': ['Believers Country', 'CMI'],
        'url': SITE_URL, 'logo': SITE_URL + 'assets/favicon-512.png', 'image': SITE_URL + 'assets/og-image.png', 'slogan': 'Living Eternal Life Abundantly.',
        'description': 'Believers Country is the communal expression of Country Ministries International: a people belonging to the Father, a life received in the Son, a country expressed through His Spirit.',
-       'address': {'@type': 'PostalAddress', 'addressCountry': 'NG'}, 'sameAs': [LINKS['youtube']]}
+       'address': {'@type': 'PostalAddress', 'addressCountry': 'NG'}, 'email': EMAIL, 'sameAs': [LINKS['youtube']]}
 CRUMB_NAMES = {'about': 'About', 'ministries': 'CMI ministry expressions', 'encounters': 'Weekly encounters', 'listen': 'Listen', '2-minutes': 'The listening room',
                'teachings': 'Shabbat teachings', 'spiritual-intent': 'Spiritual Intent', 'books': 'Money Under God', 'year-5787': 'The Year 5787',
                'contact': 'Contact', 'privacy': 'Privacy Policy', 'terms': 'Terms of Use'}
@@ -764,7 +765,8 @@ def contact(r):
                      [('#gather', 'Join a gathering'), ('#give', 'Give · Partner · Support'), ('#steps', 'First steps')], aside=portrait(r)) + f'''
 <section class="section tight" id="gather" style="padding-top:0"><div class="container"><div class="section-head reveal"><div><h2>Join a <em>gathering.</em></h2><p class="lead">Each weekly encounter has its own WhatsApp community, where joining details and notices are shared.</p></div></div>
 <div class="grid g3 reveal-stagger">{cards}</div>
-<a class="card yt-band reveal" href="{LINKS['youtube']}" target="_blank" rel="noopener"><span class="ico">{I['youtube']}</span><span><b>Watch on YouTube</b><small>Past gatherings and teachings · @believerscountry</small></span><span class="circle">{I['up']}</span></a></div></section>
+<div class="grid g2 bands"><a class="card yt-band reveal" href="{LINKS['youtube']}" target="_blank" rel="noopener"><span class="ico">{I['youtube']}</span><span><b>Watch on YouTube</b><small>Past gatherings and teachings · @believerscountry</small></span><span class="circle">{I['up']}</span></a>
+<a class="card yt-band mail-band reveal" href="mailto:{EMAIL}"><span class="ico">{I['mail']}</span><span><b>Email us</b><small>{EMAIL.replace('@', '<wbr>@')}</small></span><span class="circle">{I['up']}</span></a></div></div></section>
 {give_section()}
 <section class="section tight" id="steps"><div class="container"><div class="section-head reveal"><h2>Your first <em>steps.</em></h2></div><div class="grid g4 reveal-stagger">{st}</div></div></section>'''
 
