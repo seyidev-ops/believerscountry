@@ -54,6 +54,8 @@ for s in SERVICES:
     s['iso'] = dt.datetime.strptime(s['date'], '%d %B %Y').date().isoformat()
 
 EPISODES = [
+    dict(slug='son-talk-part-1', title='Son Talk (Part 1)', date='2026-10-24', seconds=86, label='1:26',
+         word='Son talk', blurb='The first of a short series on the Son: a brief word on who He is and what He has accomplished.'),
     dict(slug='who-are-believers', title='Who Are Believers', date='2026-10-23', seconds=87, label='1:27',
          word='Who are believers', blurb='Who the believer is in the Son: a short word on the identity of those who believe on Him.'),
     dict(slug='believe-on-him-part-3', title='Believe On Him (Part 3)', date='2026-10-22', seconds=86, label='1:26',
@@ -321,7 +323,7 @@ def player(r, ep, today=False, feature=False, tools=True):
             f'<div class="player-time"><span class="t-cur">0:00</span><span class="t-total">{ep["label"]}</span></div>{t}</div></div>')
 
 def ep_card(r, ep):
-    ax = {'who-are-believers': '40%', 'believe-on-him-part-3': '75%', 'how-believe-comes': '20%', 'believing-on-him-part-2': '55%', 'believe-on-him-part-1': '35%', 'the-measuring-line': '60%', 'no-separation': '25%', 'proof-that-you-know-god': '70%', 'what-is-your-advantage-as-a-believer': '45%', 'relationship-with-the-father': '80%'}[ep['slug']]
+    ax = {'son-talk-part-1': '65%', 'who-are-believers': '40%', 'believe-on-him-part-3': '75%', 'how-believe-comes': '20%', 'believing-on-him-part-2': '55%', 'believe-on-him-part-1': '35%', 'the-measuring-line': '60%', 'no-separation': '25%', 'proof-that-you-know-god': '70%', 'what-is-your-advantage-as-a-believer': '45%', 'relationship-with-the-father': '80%'}[ep['slug']]
     return f'''<article class="card ep" style="--ax:{ax}"><div class="art" aria-hidden="true"><span class="rings"></span><span class="art-dur">{ep['label']}</span><span class="art-word">{e(ep['word'])}</span></div>
 <div class="kicker">{ep['pretty']} <span class="badge latest" data-today-flag="{ep['slug']}" hidden>Today</span></div>
 <h3><a class="card-link" href="{r}{ep['path']}">{e(ep['title'])}</a></h3><p>{e(ep['blurb'])}</p>{player(r, ep)}</article>'''
