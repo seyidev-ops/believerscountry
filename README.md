@@ -15,7 +15,7 @@ All pages are generated. Edit, then run:
 python3 tools/build_site.py
 ```
 
-- Podcast episodes: `EPISODES` in `tools/build_site.py` (MP3s in `assets/audio/`).
+- Podcast episodes: `EPISODES` in `tools/build_site.py` (MP3s in `assets/audio/`). Clean every new recording first: `python3 tools/clean_audio.py INPUT assets/audio/SLUG.mp3 "Title"` (removes background noise, evens loudness).
 - Shabbat teachings: `content/shabbat-services-5787-q1.json` (extracted from the Q1 manuscript with `tools/extract_services.py`).
 - Encounter times and WhatsApp links: `ENCOUNTERS` and `LINKS` in `tools/build_site.py`, and `SESSIONS` in `assets/app.js`.
 - Styles: `assets/styles.css`; behaviour: `assets/app.js`.
