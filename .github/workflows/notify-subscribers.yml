@@ -1,0 +1,28 @@
+name: Email subscribers about the new 2 Minutes word
+
+# Runs when a new episode is published, plus a safety check each evening after 6 PM WAT.
+# The email service ignores an episode it has already sent, so extra runs never send twice.
+on:
+  push:
+    branches: [main]
+    paths: [episodes.json]
+  schedule:
+    - cron: '20 17 * * *'   # 6:20 PM WAT
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Wait for the website to finish publishing
+        if: github.event_name == 'push'
+        run: sleep 90
+      - name: Send today's word to the email list
+        env:
+          NOTIFY_URL: ${{ secrets.NOTIFY_URL }}
+          NOTIFY_TOKEN: ${{ secrets.NOTIFY_TOKEN }}
+        run: python3 tools/notify_subscribers.py

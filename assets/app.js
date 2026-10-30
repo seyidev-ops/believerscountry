@@ -297,6 +297,18 @@
     });
   }
   if ($('[data-countdown]')) { paintCountdown(); setInterval(paintCountdown, 30e3); }
+  $$('[data-ics="daily"]').forEach(b => b.addEventListener('click', e => {
+    e.stopImmediatePropagation();
+    const now = new Date(), stamp = d => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+    const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 17, 5));
+    const appUrl = new URL(ROOT + 'listen/2-minutes/?source=reminder', location.href).href;
+    const txt = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Believers Country//2 Minutes//EN', 'BEGIN:VEVENT', 'UID:bc-2min-daily@believerscountry', 'DTSTAMP:' + stamp(now),
+      'DTSTART:' + stamp(start), 'DTEND:' + stamp(new Date(+start + 10 * 60e3)), 'RRULE:FREQ=DAILY', 'SUMMARY:Today’s 2 minutes · Believers Country',
+      'DESCRIPTION:A new word is out. Listen: ' + appUrl, 'URL:' + appUrl, 'BEGIN:VALARM', 'ACTION:DISPLAY', 'DESCRIPTION:Today’s 2 minutes is out', 'TRIGGER:PT0M', 'END:VALARM', 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([txt], { type: 'text/calendar;charset=utf-8' })); a.download = '2-minutes-daily-reminder.ics';
+    document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+    const m = $('[data-notify-msg]'); if (m) m.textContent = 'Open the downloaded file to add a reminder at 6:05 PM every evening.';
+  }));
   $$('[data-ics]').forEach(b => b.addEventListener('click', () => {
     const s = SESSIONS[b.dataset.ics]; if (!s) return;
     const at = new Date(nextOf(s)), stamp = d => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
@@ -377,6 +389,80 @@
     if (t) t.textContent = ok ? 'Copied' : b.dataset.copy; b.classList.add('copied');
     setTimeout(() => { if (t) t.textContent = 'Copy'; b.classList.remove('copied'); }, 2000);
   }));
+
+  /* ---------------- 2 Minutes app: install, notifications, email ---------------- */
+  let swReg = null;
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === '127.0.0.1')) {
+    navigator.serviceWorker.register(ROOT + 'sw.js', { scope: ROOT || './' }).then(r => { swReg = r; }).catch(() => {});
+  }
+  // Tell the app which word the visitor has already heard, so it does not notify about it again.
+  if (todayEp && 'serviceWorker' in navigator) navigator.serviceWorker.ready.then(r => r.active && r.active.postMessage({ type: 'seen', slug: todayEp.slug })).catch(() => {});
+
+  const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  let deferredPrompt = null;
+  const installBtn = $('[data-install]'), installMsg = $('[data-install-msg]');
+  addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt = e; });
+  addEventListener('appinstalled', () => { if (installMsg) installMsg.textContent = 'Installed. Look for “2 Minutes” on your home screen.'; });
+  if (installBtn) {
+    if (standalone) { installBtn.disabled = true; installBtn.textContent = 'Installed on this device'; }
+    installBtn.addEventListener('click', async () => {
+      if (deferredPrompt) { deferredPrompt.prompt(); const c = await deferredPrompt.userChoice; deferredPrompt = null; if (installMsg && c.outcome !== 'accepted') installMsg.textContent = 'No problem. You can install it any time from here.'; return; }
+      if (!installMsg) return;
+      installMsg.textContent = isIOS
+        ? 'On iPhone or iPad: tap the Share button in Safari, then “Add to Home Screen”.'
+        : 'Open your browser menu (⋮ or ⋯) and choose “Install app” or “Add to Home screen”.';
+    });
+    if (new URLSearchParams(location.search).get('install') === '1') {
+      const card = installBtn.closest('.sub-card'); if (card) card.classList.add('pulse');
+      setTimeout(() => installBtn.click(), 900);
+    }
+  }
+
+  const notifyBtn = $('[data-notify]'), notifyMsg = $('[data-notify-msg]');
+  const say = (el, t) => { if (el) el.textContent = t; };
+  if (notifyBtn) {
+    const canNotify = 'Notification' in window && 'serviceWorker' in navigator;
+    if (canNotify && Notification.permission === 'granted') notifyBtn.textContent = 'Notifications are on';
+    notifyBtn.addEventListener('click', async () => {
+      if (!canNotify) { say(notifyMsg, 'This browser cannot show notifications. Use the daily calendar reminder instead.'); return; }
+      if (isIOS && !standalone) { say(notifyMsg, 'On iPhone, install the app first (Share → Add to Home Screen), then turn on notifications from inside the app.'); return; }
+      const perm = await Notification.requestPermission();
+      if (perm !== 'granted') { say(notifyMsg, 'Notifications are off. You can use the daily calendar reminder instead.'); return; }
+      const reg = await navigator.serviceWorker.ready;
+      let periodic = false;
+      if ('periodicSync' in reg) {
+        try { const st = await navigator.permissions.query({ name: 'periodic-background-sync' }); if (st.state === 'granted') { await reg.periodicSync.register('new-episode', { minInterval: 6 * 3600e3 }); periodic = true; } } catch (_) {}
+      }
+      notifyBtn.textContent = 'Notifications are on';
+      reg.showNotification('Notifications are on', { body: 'We will let you know when the next 2 Minutes word is out.', icon: ROOT + 'assets/app-icon-192.png', tag: 'bc-welcome' });
+      say(notifyMsg, periodic ? 'Done. The app will check for each new word and notify you.'
+        : 'Done. You will be notified when you open the app and a new word is waiting. For a reminder every evening, add the daily calendar reminder too.');
+    });
+    // When the app opens with notifications on, check straight away for a word not yet heard.
+    if (canNotify && Notification.permission === 'granted') navigator.serviceWorker.ready.then(r => r.active && r.active.postMessage({ type: 'check' })).catch(() => {});
+  }
+
+  const subForm = $('[data-subscribe]');
+  if (subForm) subForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    const msg = $('.sub-msg', subForm), email = subForm.email.value.trim(), name = subForm.name.value.trim();
+    if (subForm.website.value) return;                                     // spam trap
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { say(msg, 'Please enter a valid email address.'); subForm.email.focus(); return; }
+    const endpoint = subForm.dataset.endpoint;
+    const btn = $('button[type=submit]', subForm); btn.disabled = true;
+    if (!endpoint) {                                                       // service not connected yet: send the request by email
+      location.href = 'mailto:' + subForm.dataset.fallback + '?subject=' + encodeURIComponent('Subscribe me to the 2 Minutes Podcast') + '&body=' + encodeURIComponent('Please add me to the 2 Minutes email list.\n\nName: ' + name + '\nEmail: ' + email);
+      say(msg, 'Your email app is opening with the request. Press send to finish.'); btn.disabled = false; return;
+    }
+    say(msg, 'Subscribing…');
+    try {
+      await fetch(endpoint, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ action: 'subscribe', email, name, source: location.pathname }) });
+      subForm.reset(); say(msg, 'You are subscribed. Check your inbox for a welcome email (and your spam folder, just in case).');
+      try { localStorage.setItem('bc-subscribed', '1'); } catch (_) {}
+    } catch (_) { say(msg, 'That did not go through. Please check your connection and try again.'); }
+    btn.disabled = false;
+  });
 
   /* ---------------- footer year ---------------- */
   $$('[data-year]').forEach(el => el.textContent = new Date().getFullYear());

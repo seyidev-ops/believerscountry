@@ -1,0 +1,45 @@
+{
+ "name": "2 Minutes · Believers Country",
+ "short_name": "2 Minutes",
+ "id": "/listen/2-minutes/",
+ "description": "A new word every evening from Believers Country. Listen, download and share.",
+ "start_url": "/listen/2-minutes/?source=app",
+ "scope": "/",
+ "display": "standalone",
+ "orientation": "portrait",
+ "background_color": "#f7f2e6",
+ "theme_color": "#f7f2e6",
+ "categories": [
+  "lifestyle",
+  "education",
+  "books"
+ ],
+ "icons": [
+  {
+   "src": "/assets/app-icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png"
+  },
+  {
+   "src": "/assets/app-icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png"
+  },
+  {
+   "src": "/assets/app-icon-maskable-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "maskable"
+  }
+ ],
+ "shortcuts": [
+  {
+   "name": "Today’s 2 minutes",
+   "url": "/listen/2-minutes/?source=app#today"
+  },
+  {
+   "name": "Shabbat teachings",
+   "url": "/teachings/"
+  }
+ ]
+}

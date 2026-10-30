@@ -16,6 +16,9 @@ NOW = dt.datetime.now(WAT)
 SACRED = (NOW + dt.timedelta(days=1)).date() if NOW.hour >= 18 else NOW.date()
 
 EMAIL = 'countryministriesinternational@gmail.com'
+# Web address of the email sign-up service (Google Apps Script web app, see tools/subscribe/SETUP.md).
+# Leave empty until it is deployed: the form then sends a sign-up request by email instead.
+SUBSCRIBE_URL = ''
 LINKS = {
     'youtube': 'https://www.youtube.com/@believerscountry',
     'ministering': 'https://chat.whatsapp.com/B9DSqidV9SA0iyL6UemfM1',
@@ -106,6 +109,9 @@ def episode_for(day):
 
 # ------------------------------------------------------------------ icons
 I = {
+ 'bell': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>',
+ 'phone': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M11 18h2"/></svg>',
+ 'rss': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a9 9 0 0 1 9 9M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1.2" fill="currentColor"/></svg>',
  'copy': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2.5"/><path d="M5 15V5.5A2.5 2.5 0 0 1 7.5 3H15"/></svg>',
  'gift': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13M3 12h18M12 8S9.5 3 7 4.5 8.5 8 12 8Zm0 0s2.5-5 5-3.5S15.5 8 12 8Z"/></svg>',
  'arrow': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
@@ -258,6 +264,10 @@ def page(path, title, desc, body, section='', jsonld=None, extra_head='', out_fi
 <link rel="icon" href="{r}assets/favicon-cmi.png" type="image/png" sizes="192x192" data-favicon-png="{r}assets/favicon-cmi">
 <script>(function(){{var n=document.documentElement.dataset.theme==='night',a=document.querySelector('[data-favicon]'),b=document.querySelector('[data-favicon-png]');if(a)a.href=a.dataset.favicon+(n?'night':'day')+'.svg';if(b)b.href=b.dataset.faviconPng+(n?'-night':'')+'.png'}})()</script>
 <link rel="apple-touch-icon" href="{r}assets/apple-touch-icon.png">
+<link rel="manifest" href="{r}manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="2 Minutes"><meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="alternate" type="application/rss+xml" title="2 Minutes Podcast · Believers Country" href="{SITE_URL}feed.xml">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="{r}assets/styles.css">
 {ld}
@@ -462,7 +472,7 @@ def home(r):
 <div class="hdate"><span data-hdate>{SACRED.strftime('%-d %B %Y')}</span><span class="hebrew" data-hdate-heb></span></div>
 <div class="today-meta"><span data-hweekday></span> · <span data-hcivil></span><br><span data-hseq></span> · <span data-hmovement></span><br><span data-hboundary>The day begins at 6:00 PM</span></div></div>
 <div class="today-cell" data-today-wrap><div class="today-label">{I['headphones'].replace('<svg', '<svg width="14" height="14"')} Today’s 2 minutes</div>{player(r, ep, today=True)}
-<a class="textlink" style="margin-top:12px" href="{r}listen/2-minutes/" data-today-link>All episodes <span class="arr">→</span></a></div>
+<div style="display:flex;gap:18px;flex-wrap:wrap;margin-top:12px"><a class="textlink" href="{r}listen/2-minutes/" data-today-link>All episodes <span class="arr">→</span></a><a class="textlink" href="{r}listen/2-minutes/#subscribe">{I['bell'].replace('<svg', '<svg width=14 height=14')} Get it every evening</a></div></div>
 <div class="today-cell" data-countdown><div class="today-label">Next encounter</div><div class="countdown"><span data-cd-title>Shabbat Service</span><small><span data-cd-when></span></small></div>
 <div class="today-meta">Begins in <b data-cd-time>—</b></div><a class="button wa" style="margin-top:14px;min-height:42px" data-cd-join href="{LINKS['shabbat']}" target="_blank" rel="noopener">{I['whatsapp']} Join on WhatsApp</a></div>
 </div></div></section>
@@ -627,6 +637,25 @@ def archive_row(r, x, kind):
             f'<div class="arc-info"><span class="badge{" audio" if kind == "shabbat" else ""}">{label} · {x["label"]}</span>'
             f'<h3><a href="{r}{href}">{e(x["title"])}</a></h3><p>{e(sub)}</p></div>{player(r, x)}</article>')
 
+def subscribe_section(r):
+    return f'''<section class="section tight" id="subscribe"><div class="container"><div class="panel subscribe reveal">
+<div class="sub-intro"><div class="icon-letter" aria-hidden="true">{I['bell']}</div><h2>Never miss <em>a word.</em></h2>
+<p class="lead">A new 2 Minutes word drops every evening at 6:00 PM, when the new day begins. Choose how you would like to hear about it.</p></div>
+<div class="sub-ways">
+<form class="sub-card sub-email" data-subscribe data-endpoint="{SUBSCRIBE_URL}" data-fallback="{EMAIL}" novalidate>
+<div class="sub-head"><span class="sub-ico">{I['mail']}</span><div><b>Email me each new word</b><small>One short email when it drops. Unsubscribe any time.</small></div></div>
+<div class="sub-row"><label class="sr-only" for="sub-name">First name</label><input id="sub-name" name="name" type="text" autocomplete="given-name" placeholder="First name">
+<label class="sr-only" for="sub-email">Email address</label><input id="sub-email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="you@example.com" required></div>
+<input type="text" name="website" tabindex="-1" autocomplete="off" class="hp" aria-hidden="true">
+<button class="button gold" type="submit">{I['mail']} Subscribe</button><p class="sub-msg small" role="status" aria-live="polite"></p></form>
+<div class="sub-card"><div class="sub-head"><span class="sub-ico">{I['phone']}</span><div><b>Get the 2 Minutes app</b><small>Add it to your home screen. It opens straight to today’s word, even on a weak connection.</small></div></div>
+<div class="sub-actions"><button class="button primary" type="button" data-install>{I['download']} Install the app</button>{share_box('2 Minutes · the Believers Country app', r + 'app/')}</div>
+<p class="sub-msg small" data-install-msg role="status" aria-live="polite"></p></div>
+<div class="sub-card"><div class="sub-head"><span class="sub-ico">{I['bell']}</span><div><b>Remind me on this device</b><small>An app notification when the new word is out, or a daily 6 PM reminder in your calendar.</small></div></div>
+<div class="sub-actions"><button class="button ghost" type="button" data-notify>{I['bell']} Turn on notifications</button><button class="chip" type="button" data-ics="daily">{I['cal']} Daily calendar reminder</button><a class="chip" href="{SITE_URL}feed.xml">{I['rss']} Podcast feed</a></div>
+<p class="sub-msg small" data-notify-msg role="status" aria-live="polite"></p></div>
+</div></div></div></section>'''
+
 def listen(r):
     ep = episode_for(SACRED)
     rows = [archive_row(r, x, 'podcast') for x in EPISODES] + [archive_row(r, x, 'shabbat') for x in SERVICES if x.get('audio')]
@@ -636,6 +665,7 @@ def listen(r):
 <section class="section tight" style="padding-top:0"><div class="container"><div class="panel feature-player reveal" data-today-wrap>
 <div class="today-label"><span class="live-dot"></span> Today’s 2 minutes · <span data-hcivil></span></div>{player(r, ep, today=True, feature=True)}
 <p class="muted small" style="margin:14px 0 0">A new day begins at 6:00 PM, and so does the day’s word. <a class="textlink" data-today-link href="{r}{ep['path']}">Episode page <span class="arr">→</span></a></p></div></div></section>
+{subscribe_section(r)}
 <section class="section tight" id="archive"><span id="shabbat"></span><div class="container"><div class="section-head reveal"><div><h2>The <em>archive.</em></h2><p class="lead">Every recording in one place. Search by title or topic, filter by kind, and sort by date.</p></div>
 <a class="button ghost" href="{LINKS['youtube']}" target="_blank" rel="noopener">{I['youtube']} More on YouTube</a></div>
 <div class="filters reveal" data-arc-tools><label class="sr-only" for="arc-q">Search recordings</label><input id="arc-q" type="search" placeholder="Search a title, topic or scripture…" data-arc-search>
@@ -807,7 +837,9 @@ def give_section():
 def legal(kind):
     def body(r):
         if kind == 'privacy':
-            secs = [('What we collect', 'This website does not ask you to create an account and has no sign-up, payment or contact forms. We do not run advertising or tracking cookies.'),
+            secs = [('What we collect', 'This website does not ask you to create an account and has no payment forms. We do not run advertising or tracking cookies. If you subscribe to the 2 Minutes Podcast, we keep your email address and, if you give it, your first name.'),
+                    ('Email subscriptions', 'Subscriber details are stored in a private Google Sheet belonging to Country Ministries International and are used only to send the new 2 Minutes word. We never sell or share them. Every email has a one-click unsubscribe link, and you can also ask us to remove you at ' + EMAIL + '.'),
+                    ('App and notifications', 'If you install the 2 Minutes app or turn on notifications, the check for a new word happens on your own device. We do not receive or store anything from it.'),
                     ('Your preferences', 'Your Day, Night or Auto choice is saved in your own browser’s local storage so the site remembers it. It never leaves your device, and you can clear it at any time through your browser settings.'),
                     ('Audio and downloads', 'Podcast audio is served from this website when you press play or download. Your browser makes the request in the ordinary way; we do not build listening profiles.'),
                     ('Third-party services', 'Fonts are loaded from Google Fonts, and the site is hosted on GitHub Pages; both may receive standard technical information such as your IP address and browser type. When you follow a link to WhatsApp, YouTube or a social network to share, that service’s own privacy policy applies.'),
@@ -832,6 +864,47 @@ def legal(kind):
     page(f'{kind}/', title, f'Believers Country {title}.', body)
 
 # ------------------------------------------------------------------ build
+def write_app_files():
+    import hashlib
+    today = SACRED.isoformat()
+    live = [ep for ep in EPISODES if ep['date'] <= today]
+    # episodes.json: what the app and the email notifier read
+    (ROOT / 'episodes.json').write_text(json.dumps([{k: ep[k] for k in ('slug', 'title', 'date', 'seconds', 'label', 'blurb')} | {'path': ep['path'], 'audio': ep['audio'], 'url': SITE_URL + ep['path']} for ep in EPISODES], ensure_ascii=False, indent=1))
+    # podcast RSS feed (podcast apps, feed readers)
+    from email.utils import format_datetime
+    items = ''
+    for ep in live:
+        d = dt.datetime.fromisoformat(ep['date'] + 'T18:00:00+01:00') - dt.timedelta(days=1)
+        size = (ROOT / ep['audio']).stat().st_size
+        items += (f"<item><title>{e(ep['title'])}</title><description>{e(ep['blurb'])}</description><link>{SITE_URL}{ep['path']}</link>"
+                  f"<guid isPermaLink=\"false\">bc-2min-{ep['slug']}</guid><pubDate>{format_datetime(d)}</pubDate>"
+                  f"<enclosure url=\"{SITE_URL}{ep['audio']}\" length=\"{size}\" type=\"audio/mpeg\"/>"
+                  f"<itunes:duration>{ep['seconds']}</itunes:duration><itunes:explicit>false</itunes:explicit></item>\n")
+    feed = f'''<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel><title>2 Minutes Podcast · Believers Country</title><link>{SITE_URL}listen/2-minutes/</link>
+<atom:link href="{SITE_URL}feed.xml" rel="self" type="application/rss+xml"/>
+<description>A brief word, with room to reflect. One new word every evening from Believers Country, Country Ministries International.</description>
+<language>en</language><copyright>© Country Ministries International</copyright>
+<itunes:author>Believers Country</itunes:author><itunes:owner><itunes:name>Country Ministries International</itunes:name><itunes:email>{EMAIL}</itunes:email></itunes:owner>
+<itunes:image href="{SITE_URL}assets/app-icon-512.png"/><itunes:category text="Religion &amp; Spirituality"><itunes:category text="Christianity"/></itunes:category><itunes:explicit>false</itunes:explicit>
+<image><url>{SITE_URL}assets/app-icon-512.png</url><title>2 Minutes Podcast · Believers Country</title><link>{SITE_URL}listen/2-minutes/</link></image>
+{items}</channel></rss>
+'''
+    (ROOT / 'feed.xml').write_text(feed)
+    manifest = {'name': '2 Minutes · Believers Country', 'short_name': '2 Minutes', 'id': '/listen/2-minutes/',
+                'description': 'A new word every evening from Believers Country. Listen, download and share.',
+                'start_url': '/listen/2-minutes/?source=app', 'scope': '/', 'display': 'standalone', 'orientation': 'portrait',
+                'background_color': '#f7f2e6', 'theme_color': '#f7f2e6', 'categories': ['lifestyle', 'education', 'books'],
+                'icons': [{'src': '/assets/app-icon-192.png', 'sizes': '192x192', 'type': 'image/png'},
+                          {'src': '/assets/app-icon-512.png', 'sizes': '512x512', 'type': 'image/png'},
+                          {'src': '/assets/app-icon-maskable-512.png', 'sizes': '512x512', 'type': 'image/png', 'purpose': 'maskable'}],
+                'shortcuts': [{'name': 'Today’s 2 minutes', 'url': '/listen/2-minutes/?source=app#today'},
+                              {'name': 'Shabbat teachings', 'url': '/teachings/'}]}
+    (ROOT / 'manifest.webmanifest').write_text(json.dumps(manifest, ensure_ascii=False, indent=1))
+    ver = hashlib.sha1(((ROOT / 'assets/styles.css').read_bytes() + (ROOT / 'assets/app.js').read_bytes() + feed.encode())).hexdigest()[:10]
+    (ROOT / 'sw.js').write_text((ROOT / 'tools/sw.template.js').read_text().replace('__VERSION__', ver))
+
 def main():
     page('', 'Believers Country', 'Believers Country — Country Ministries International. Weekly encounters, Shabbat teachings celebrating the Son, the 2 Minutes Podcast and the Spiritual Intent books.', home, 'home',
          None)
@@ -840,6 +913,9 @@ def main():
     for i, s in enumerate(STREAMS): stream_page(s, i)
     page('encounters/', 'Weekly encounters', 'School of Scriptures on Wednesday, Ministering to the LORD on Thursday and Shabbat Service on Saturday — join on WhatsApp.', encounters, 'encounters')
     for i, x in enumerate(ENCOUNTERS): encounter_page(x, i)
+    page('app/', 'The 2 Minutes app', 'Get the Believers Country 2 Minutes app: a new word every evening, on your home screen.',
+         lambda r: f'<section class="page-hero"><div class="container reveal"><h1>The 2 Minutes <em>app.</em></h1><p class="lead">Opening the listening room…</p><p><a class="button gold" href="{r}listen/2-minutes/?install=1#subscribe">Open the app</a></p></div></section>',
+         'listen', extra_head='<meta http-equiv="refresh" content="0; url=../listen/2-minutes/?install=1#subscribe">')
     page('listen/2-minutes/', '2 Minutes Podcast', 'Short original messages from Believers Country. Listen today, download or share.', listen, 'listen',
          {'@type': 'PodcastSeries', 'name': '2 Minutes Podcast', 'description': 'Short original messages from Believers Country, one for each day.', 'url': SITE_URL + 'listen/2-minutes/', 'inLanguage': 'en',
           'image': SITE_URL + 'assets/og-image.png', 'author': {'@type': 'Organization', 'name': 'Country Ministries International'}})
@@ -851,6 +927,7 @@ def main():
     page('year-5787/', 'The Year 5787', 'The Hebrew year 5787 — Tav, Shin, Pe, Zayin: the year of the crowned mouth. Four movements, thirteen months, today’s sequence.', year, 'year')
     page('contact/', 'Contact', 'Connect with Believers Country through our WhatsApp communities and YouTube channel.', contact)
     legal('privacy'); legal('terms')
+    write_app_files()
     # legacy route kept as a redirect
     (ROOT / 'ministries/country-commonwealth/index.html').write_text('<!DOCTYPE html><meta charset="utf-8"><title>Commonwealth | Believers Country</title><meta name="robots" content="noindex"><meta http-equiv="refresh" content="0; url=../commonwealth/"><link rel="canonical" href="https://believerscountry.org/ministries/commonwealth/"><p>Moved to <a href="../commonwealth/">Commonwealth</a>.</p>')
     def prio(p):
