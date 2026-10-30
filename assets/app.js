@@ -493,6 +493,16 @@
     btn.disabled = false;
   });
 
+  /* ---------------- refresh: clear the app's stored copies and load the latest ---------------- */
+  const refreshBtn = $('[data-refresh]');
+  if (refreshBtn) refreshBtn.addEventListener('click', async () => {
+    refreshBtn.classList.add('spinning');
+    try { if ('caches' in window) { const keys = await caches.keys(); await Promise.all(keys.filter(k => k.startsWith('bc-') && k !== 'bc-meta').map(k => caches.delete(k))); } } catch (_) {}
+    try { const reg = await navigator.serviceWorker?.getRegistration(); if (reg) await reg.update(); } catch (_) {}
+    const u = new URL(location.href); u.searchParams.set('r', Date.now().toString(36));
+    setTimeout(() => location.replace(u.href), 350);
+  });
+
   /* ---------------- footer year ---------------- */
   $$('[data-year]').forEach(el => el.textContent = new Date().getFullYear());
 })();

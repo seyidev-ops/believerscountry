@@ -109,6 +109,7 @@ def episode_for(day):
 
 # ------------------------------------------------------------------ icons
 I = {
+ 'cookie': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.3A9 9 0 1 1 11.7 3a3 3 0 0 0 3.6 3.6 3 3 0 0 0 3.6 3.6 3 3 0 0 0 2.1 2.1Z"/><circle cx="8.5" cy="10" r=".9" fill="currentColor"/><circle cx="12" cy="15.5" r=".9" fill="currentColor"/><circle cx="16" cy="13" r=".7" fill="currentColor"/><circle cx="8" cy="15" r=".6" fill="currentColor"/></svg>',
  'bell': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>',
  'phone': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M11 18h2"/></svg>',
  'rss': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a9 9 0 0 1 9 9M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1.2" fill="currentColor"/></svg>',
@@ -292,6 +293,7 @@ def page(path, title, desc, body, section='', jsonld=None, extra_head='', out_fi
 {body(r) if callable(body) else body}
 </main>
 {footer(r)}
+<button class="refresh-fab" type="button" data-refresh aria-label="Refresh the page and load the latest version" title="Refresh">{I['cookie']}<span class="refresh-tip">Refresh</span></button>
 <script type="application/json" id="episodes-data">{eps}</script>
 <script src="{r}assets/app.js?v={asset_v()}" defer></script>
 </body>
