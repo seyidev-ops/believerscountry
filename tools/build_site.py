@@ -218,6 +218,10 @@ CRUMB_NAMES = {'about': 'About', 'ministries': 'CMI ministry expressions', 'enco
                'contact': 'Contact', 'privacy': 'Privacy Policy', 'terms': 'Terms of Use'}
 OG_TYPE = {'teachings': 'article', 'listen': 'article'}
 
+TAB_ICONS = '''<link rel="icon" href="{r}assets/favicon-day.svg" type="image/svg+xml" data-favicon="{r}assets/favicon-">
+<link rel="icon" href="{r}assets/favicon-cmi.png" type="image/png" sizes="192x192" data-favicon-png="{r}assets/favicon-cmi">
+<script>(function(){var n=document.documentElement.dataset.theme==='night',a=document.querySelector('[data-favicon]'),b=document.querySelector('[data-favicon-png]');if(a)a.href=a.dataset.favicon+(n?'night':'day')+'.svg';if(b)b.href=b.dataset.faviconPng+(n?'-night':'')+'.png'})()</script>'''
+
 _ASSET_V = None
 def asset_v():
     global _ASSET_V
@@ -256,6 +260,11 @@ def page(path, title, desc, body, section='', jsonld=None, extra_head='', out_fi
     og_img = 'assets/og-app.png' if is_app else 'assets/og-image.png'
     og_alt = 'The 2 Minutes app · Believers Country' if is_app else 'Believers Country — Country Ministries International'
     touch = 'assets/apple-touch-icon-app.png' if is_app else 'assets/apple-touch-icon.png'
+    if is_app:
+        icons = (f'<link rel="icon" href="{r}assets/app-icon-192.png" type="image/png" sizes="192x192">'
+                 f'<link rel="icon" href="{r}assets/app-icon-512.png" type="image/png" sizes="512x512">')
+    else:
+        icons = TAB_ICONS.replace('{r}', r)
     eps = json.dumps([{k: ep[k] for k in ('slug', 'title', 'date', 'audio', 'path', 'seconds', 'label')} for ep in EPISODES])
     doc = f'''<!DOCTYPE html>
 <html lang="en" class="no-js" data-mode="system" data-theme="day" data-root="{r}">
@@ -273,9 +282,7 @@ def page(path, title, desc, body, section='', jsonld=None, extra_head='', out_fi
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="{e(full_title)}"><meta name="twitter:description" content="{e(desc)}"><meta name="twitter:image" content="{SITE_URL}{og_img}">
 <link rel="sitemap" type="application/xml" href="{SITE_URL}sitemap.xml">
 <script>(function(){{var d=document.documentElement,m='system';try{{m=localStorage.getItem('bc-experience-v3')||localStorage.getItem('bc-experience-v2')||'system'}}catch(e){{}}if(['day','night','system'].indexOf(m)<0)m='system';d.dataset.mode=m;d.dataset.theme=m==='system'?(matchMedia('(prefers-color-scheme: dark)').matches?'night':'day'):m}})()</script>
-<link rel="icon" href="{r}assets/favicon-day.svg" type="image/svg+xml" data-favicon="{r}assets/favicon-">
-<link rel="icon" href="{r}assets/favicon-cmi.png" type="image/png" sizes="192x192" data-favicon-png="{r}assets/favicon-cmi">
-<script>(function(){{var n=document.documentElement.dataset.theme==='night',a=document.querySelector('[data-favicon]'),b=document.querySelector('[data-favicon-png]');if(a)a.href=a.dataset.favicon+(n?'night':'day')+'.svg';if(b)b.href=b.dataset.faviconPng+(n?'-night':'')+'.png'}})()</script>
+{icons}
 <link rel="apple-touch-icon" href="{r}{touch}">
 <link rel="manifest" href="{r}manifest.webmanifest">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
