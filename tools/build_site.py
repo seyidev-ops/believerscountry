@@ -217,6 +217,14 @@ CRUMB_NAMES = {'about': 'About', 'ministries': 'CMI ministry expressions', 'enco
                'contact': 'Contact', 'privacy': 'Privacy Policy', 'terms': 'Terms of Use'}
 OG_TYPE = {'teachings': 'article', 'listen': 'article'}
 
+_ASSET_V = None
+def asset_v():
+    global _ASSET_V
+    if _ASSET_V is None:
+        import hashlib
+        _ASSET_V = hashlib.sha1((ROOT / 'assets/styles.css').read_bytes() + (ROOT / 'assets/app.js').read_bytes()).hexdigest()[:8]
+    return _ASSET_V
+
 def page(path, title, desc, body, section='', jsonld=None, extra_head='', out_file=None):
     depth = path.count('/') if path else 0
     r = '../' * depth
@@ -273,7 +281,7 @@ def page(path, title, desc, body, section='', jsonld=None, extra_head='', out_fi
 <meta name="apple-mobile-web-app-title" content="2 Minutes"><meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="alternate" type="application/rss+xml" title="2 Minutes Podcast · Believers Country" href="{SITE_URL}feed.xml">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="{r}assets/styles.css">
+<link rel="stylesheet" href="{r}assets/styles.css?v={asset_v()}">
 {ld}
 </head>
 <body>
@@ -285,7 +293,7 @@ def page(path, title, desc, body, section='', jsonld=None, extra_head='', out_fi
 </main>
 {footer(r)}
 <script type="application/json" id="episodes-data">{eps}</script>
-<script src="{r}assets/app.js" defer></script>
+<script src="{r}assets/app.js?v={asset_v()}" defer></script>
 </body>
 </html>
 '''
@@ -650,7 +658,7 @@ def share_app(r, cls='button ghost', label='Share the app'):
 def subscribe_section(r):
     return f'''<section class="section tight" id="subscribe" style="padding-top:0"><div class="container">
 <div class="sub-bar reveal"><details class="sub-drop" data-sub-drop>
-<summary><span class="sub-ico">{I['bell']}</span><span class="sub-sum"><b data-sub-title>Would you like to be notified when a new word drops?</b><small data-sub-note>Email, the 2 Minutes app, or a reminder on this device</small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
+<summary><span class="sub-ico">{I['bell']}</span><span class="sub-sum"><b data-sub-title>Would you like to be notified when a new word drops?</b><small data-sub-note>Email, the 2 Minutes app, or a reminder on this device</small></span><span class="sub-pill"><span data-sub-pill>Choose</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></span></summary>
 <div class="sub-ways">
 <form class="sub-card sub-email" data-subscribe data-endpoint="{SUBSCRIBE_URL}" data-fallback="{EMAIL}" novalidate>
 <div class="sub-head"><span class="sub-ico">{I['mail']}</span><div><b>Email me each new word</b><small>One short email when it drops. Unsubscribe any time.</small></div></div>

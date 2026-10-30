@@ -464,11 +464,13 @@
     drop.classList.toggle('done', parts.length > 0);
     if (parts.length) {
       $('[data-sub-title]', drop).textContent = 'You are set up for each new word';
-      $('[data-sub-note]', drop).textContent = 'Through ' + parts.join(', ').replace(/, ([^,]*)$/, ' and $1') + ' · tap to manage';
+      $('[data-sub-note]', drop).textContent = 'Through ' + parts.join(', ').replace(/, ([^,]*)$/, ' and $1');
+      const pill = $('[data-sub-pill]', drop); if (pill) pill.textContent = 'Manage';
     }
   }
   paintDrop();
   if (drop && new URLSearchParams(location.search).get('install') === '1') drop.open = true;
+  if (drop) drop.addEventListener('toggle', () => { const pill = $('[data-sub-pill]', drop); if (pill && !drop.classList.contains('done')) pill.textContent = drop.open ? 'Close' : 'Choose'; });
   addEventListener('appinstalled', () => markDone('app'));
   const subForm = $('[data-subscribe]');
   if (subForm) subForm.addEventListener('submit', async e => {
