@@ -224,7 +224,7 @@ def header(r, section):
         drawer.append(f'<details class="d-group" name="d-nav"{" open" if cur else ""}><summary>{label}{chev}</summary><div class="d-sub">{sub}</div></details>')
     return f'''<a class="skip" href="#main">Skip to content</a>
 <header class="site-header"><div class="container"><div class="bar">
-<a class="brand" href="{r or './'}" aria-label="Believers Country — home">{mark(still=True)}<span class="brand-words"><strong><span>Believers</span><span>Country</span></strong><small>CMI</small></span></a>
+<a class="brand" href="{r or './'}" aria-label="Believers Country — home">{mark(still=True)}<span class="brand-name"><em>Believers</em><span>Country</span></span></a>
 <nav class="primary-nav" aria-label="Main">{''.join(top)}</nav>
 <div class="header-actions">{toggle()}<a class="button gold join" href="{r}encounters/">Join us {I['arrow']}</a>
 <button class="menu-button" id="menu-button" type="button" aria-expanded="false" aria-controls="drawer" aria-label="Open menu"><i></i><i></i></button></div>
@@ -247,7 +247,7 @@ def cmi_header(r):
 def footer(r):
     return f'''<footer class="footer"><div class="container">
 <div class="footer-grid">
-<div><a class="footer-brand" href="{r or './'}">{mark()}<span class="brand-words"><strong><span>Believers</span><span>Country</span></strong><small>CMI</small></span></a>
+<div><a class="footer-brand" href="{r or './'}">{mark()}<span class="brand-name"><em>Believers</em><span>Country</span></span></a>
 <p>A people belonging to the Father. A life received in the Son. A country expressed through His Spirit.</p>
 <div class="socials">{share_app(r, 'icon-btn', '<span class="sr-only">Share the 2 Minutes app</span>')}<a href="{LINKS['youtube']}" target="_blank" rel="noopener" aria-label="Believers Country on YouTube">{I['youtube']}</a><a href="{LINKS['shabbat']}" target="_blank" rel="noopener" aria-label="Join the Shabbat Service WhatsApp group">{I['whatsapp']}</a><a href="mailto:{EMAIL}" aria-label="Email Country Ministries International">{I['mail']}</a></div></div>
 <div class="footer-col"><h4>Discover</h4><a href="{r}about/">Who we are</a><a href="{r}cmi/">Country Ministries International</a><a href="{r}cmi/#streams">Four ministry streams</a><a href="{r}year-5787/">The Year 5787</a><a href="{r}contact/">Contact</a><a href="{r}contact/#give">Give · Partner</a></div>
@@ -266,9 +266,20 @@ CRUMB_NAMES = {'about': 'About', 'ministries': 'CMI ministry expressions', 'enco
                'contact': 'Contact', 'privacy': 'Privacy Policy', 'terms': 'Terms of Use', 'cmi': 'Country Ministries International'}
 OG_TYPE = {'teachings': 'article', 'listen': 'article'}
 
-TAB_ICONS = '''<link rel="icon" href="{r}assets/favicon-day.svg" type="image/svg+xml" data-favicon="{r}assets/favicon-">
-<link rel="icon" href="{r}assets/favicon-cmi.png" type="image/png" sizes="192x192" data-favicon-png="{r}assets/favicon-cmi">
-<script>(function(){var n=document.documentElement.dataset.theme==='night',a=document.querySelector('[data-favicon]'),b=document.querySelector('[data-favicon-png]');if(a)a.href=a.dataset.favicon+(n?'night':'day')+'.svg';if(b)b.href=b.dataset.faviconPng+(n?'-night':'')+'.png'})()</script>'''
+TAB_ICONS = '''<link rel="icon" href="{r}assets/favicon-bc-day.svg?v=4" type="image/svg+xml" data-favicon="{r}assets/favicon-bc-" data-fv="?v=4">
+<link rel="icon" href="{r}assets/favicon-bc.png?v=4" type="image/png" sizes="192x192" data-favicon-png="{r}assets/favicon-bc" data-fv="?v=4">
+<script>(function(){var n=document.documentElement.dataset.theme==='night',a=document.querySelector('[data-favicon]'),b=document.querySelector('[data-favicon-png]');if(a)a.href=a.dataset.favicon+(n?'night':'day')+'.svg?v=4';if(b)b.href=b.dataset.faviconPng+(n?'-night':'')+'.png?v=4'})()</script>'''
+
+def favicon_svg(color):
+    """The ב and flame on a square, transparent ground, for the browser tab."""
+    view, inner, fx = _letter_geom('bet')
+    W, H = map(float, view.split()[2:])
+    S = max(W, H) + 20
+    vx, vy = (W - S) / 2, (H - S) / 2
+    grad = ('<defs><linearGradient id="g" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#c07d16"/>'
+            '<stop offset=".5" stop-color="#f2b73c"/><stop offset="1" stop-color="#ffe9a8"/></linearGradient></defs>')
+    inner = inner.replace('class="flame"', 'fill="url(#g)"').replace('class="body"', f'fill="{color}"')
+    return f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{vx:.0f} {vy:.0f} {S:.0f} {S:.0f}">{grad}{inner}</svg>'
 
 _ASSET_V = None
 def asset_v():
@@ -308,10 +319,8 @@ def page(path, title, desc, body, section='', jsonld=None, extra_head='', out_fi
     og_img = 'assets/og-app.png' if is_app else 'assets/og-cmi.png' if path.startswith('cmi/') else 'assets/og-image.png'
     og_alt = 'The 2 Minutes app · Believers Country' if is_app else 'Believers Country — Country Ministries International'
     touch = 'assets/apple-touch-icon-app.png?v=3'
-    # Every page uses the 2 Minutes app icon (the ב with the flame) as its tab icon, so sharing from
-    # anywhere on the site shows the app icon. (Previous day/night CMI tab icons: TAB_ICONS.)
-    icons = (f'<link rel="icon" href="{r}assets/app-icon-192.png?v=3" type="image/png" sizes="192x192">'
-             f'<link rel="icon" href="{r}assets/app-icon-512.png?v=3" type="image/png" sizes="512x512">')
+    # Tab icon: the ב with its flame on a transparent ground: ink in Day, white in Night (swapped live by the theme toggle).
+    icons = TAB_ICONS.replace('{r}', r)
     eps = json.dumps([{k: ep[k] for k in ('slug', 'title', 'date', 'audio', 'path', 'seconds', 'label')} for ep in EPISODES])
     doc = f'''<!DOCTYPE html>
 <html lang="en" class="no-js" data-mode="system" data-theme="day" data-root="{r}">
@@ -816,16 +825,40 @@ def episode_page(ep, idx):
           'publisher': {'@type': 'Organization', 'name': 'Country Ministries International'}})
 
 # ------------------------------------------------------------------ TEACHINGS
+def latest_teaching(r, shared):
+    if not shared:
+        return ''
+    s = shared[-1]
+    rec = [x for x in shared if x.get('audio')]
+    date = dt.date.fromisoformat(s['iso']).strftime('%A, %-d %B %Y')
+    read = f'<a class="button gold" href="{r}teachings/{s["slug"]}/">Read the teaching {I["arrow"]}</a>'
+    if s.get('audio'):
+        side = f'<div class="lt-player"><div class="today-label">{I["headphones"].replace("<svg", "<svg width=14 height=14")} Listen · {s["label"]}</div>{player(r, s, feature=True)}</div>'
+    elif rec:
+        p = rec[-1]
+        side = (f'<div class="lt-player"><div class="today-label">{I["headphones"].replace("<svg", "<svg width=14 height=14")} The recording follows the service. Meanwhile, the last one · Shabbat {p["n"]}</div>'
+                f'{player(r, p, feature=True)}</div>')
+    else:
+        side = ''
+    return f'''<section class="section tight latest-teach" style="padding-top:0" id="latest"><div class="container"><div class="lt-card reveal">
+<div class="lt-text"><div class="lt-tag"><span class="pulse-dot"></span>Latest teaching</div>
+<div class="kicker">Shabbat {s['n']} of 13 · {date}</div><h2>{e(s['title'])}</h2><p class="focus">{e(s['focus'])}</p><p class="muted">{e(s['kicker'])}</p>
+<div class="lt-actions">{read}<a class="chip" href="#all">Follow the whole series ↓</a></div></div>{side}</div></div></section>'''
+
 def teachings(r):
     latest = [s for s in SERVICES if s['iso'] <= SACRED.isoformat()]
     feat = latest[-1]['n'] if latest else 1
     cards = ''.join(svc_card(r, s, s['n'] == feat) for s in SERVICES)
     arc = [('1–3', 'Who the Son is', 'Before all things, made flesh, declared by the Father.'), ('4–7', 'His life among us', 'Testing, teaching, service and shepherding.'),
            ('8–9', 'Cross and empty tomb', 'The Lamb slain, the firstborn from the dead.'), ('10–12', 'His present ministry', 'Enthroned, interceding, joined to His body.'), ('13', 'His appearing', 'Closing the quarter in expectation.')]
+    arc_n = [(1, 3), (4, 7), (8, 9), (10, 12), (13, 13)]
+    arc_html = ''.join(f'<div class="{"now" if lo <= feat <= hi else ""}"><b>Shabbat {a}</b><span><i>{b}</i>{c}</span>{"<em class=now-pill>Now</em>" if lo <= feat <= hi else ""}</div>'
+                       for (a, b, c), (lo, hi) in zip(arc, arc_n))
     return page_hero(r, [(None, 'Teachings')], 'Shabbat teachings · First quarter of 5787', 'Celebrating <em>the Son.</em>',
                      'Thirteen Sabbaths moving in a single arc through the person and work of Christ Jesus. The quarter stands under the Tav — the sign, the seal and the mark of ownership — and its one question is whose you are. Every service answers it in the Son.') + f'''
-<section class="section tight" style="padding-top:0"><div class="container"><div class="movement-bar reveal" style="grid-template-columns:repeat(5,1fr)">{''.join(f'<div>Shabbat {a}<small>{b} — {c}</small></div>' for a, b, c in arc)}</div></div></section>
-<section class="section tight"><div class="container">
+{latest_teaching(r, latest)}
+<section class="section tight" style="padding-top:0"><div class="container"><div class="arc-bar reveal-stagger">{arc_html}</div></div></section>
+<section class="section tight" id="all"><div class="container">
 <div class="filters reveal"><label class="sr-only" for="teach-q">Search teachings</label><input id="teach-q" type="search" placeholder="Search a title, theme or scripture…" data-teach-search>
 <button class="chip" type="button" data-filter="all" aria-pressed="true">All 13</button><button class="chip" type="button" data-filter="shared" aria-pressed="false">Shared</button><button class="chip" type="button" data-filter="upcoming" aria-pressed="false">Coming</button></div>
 <div class="teach-grid reveal-stagger">{cards}</div><p class="empty" data-empty hidden>No teaching matches that search.</p></div></section>
@@ -980,6 +1013,8 @@ def legal(kind):
 
 # ------------------------------------------------------------------ build
 def write_app_files():
+    (ROOT / 'assets/favicon-bc-day.svg').write_text(favicon_svg('#17201e'))
+    (ROOT / 'assets/favicon-bc-night.svg').write_text(favicon_svg('#ffffff'))
     import hashlib
     today = SACRED.isoformat()
     live = [ep for ep in EPISODES if ep['date'] <= today]

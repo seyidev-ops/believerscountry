@@ -25,8 +25,8 @@
     if (label) label.textContent = names[m];
     // The tab icon follows the site's Day/Night choice: dark mark by day, light mark by night.
     const fav = $('[data-favicon]'), favPng = $('[data-favicon-png]');
-    if (fav) fav.href = fav.dataset.favicon + (eff === 'night' ? 'night' : 'day') + '.svg';
-    if (favPng) favPng.href = favPng.dataset.faviconPng + (eff === 'night' ? '-night' : '') + '.png';
+    if (fav) fav.href = fav.dataset.favicon + (eff === 'night' ? 'night' : 'day') + '.svg' + (fav.dataset.fv || '');
+    if (favPng) favPng.href = favPng.dataset.faviconPng + (eff === 'night' ? '-night' : '') + '.png' + (favPng.dataset.fv || '');
     const meta = $('meta[name=theme-color]');
     if (meta) meta.content = eff === 'night' ? '#050913' : '#f7f2e6';
     if (save) { try { localStorage.setItem('bc-experience-v3', m); } catch (_) {} }

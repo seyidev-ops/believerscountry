@@ -3,7 +3,7 @@
    - on supported phones (installed app, Chrome/Edge on Android and desktop), checks once or twice a day
      for a new 2 Minutes word and shows a notification when the new day's episode is out.
    The day runs 6:00 PM to 6:00 PM, West Africa Time. */
-const VERSION = 'd55f2638af';
+const VERSION = '28077d405c';
 const CACHE = 'bc-' + VERSION;
 const CORE = ['./', 'listen/2-minutes/', 'assets/styles.css', 'assets/app.js', 'assets/app-icon-192.png', 'assets/favicon-day.svg', 'manifest.webmanifest'];
 
