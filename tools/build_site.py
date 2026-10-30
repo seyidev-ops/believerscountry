@@ -142,19 +142,32 @@ DEFS = '''<svg width="0" height="0" style="position:absolute" aria-hidden="true"
 <linearGradient id="cityGlow" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe7a6" stop-opacity=".95"/><stop offset=".5" stop-color="#e8c46f" stop-opacity=".55"/><stop offset="1" stop-color="#7cd8dc" stop-opacity=".1"/></linearGradient>
 </defs></svg>'''
 
-BC_VIEW = '0 0 520 1180'
-def _bc_paths():
-    # flame from the CMI logo, scaled and set above the Hebrew letter Bet (FreeSerif Bold outline, y flipped)
-    return (f'<g transform="translate(260 22) scale(1.25) translate(-768 -241)"><path class="flame" d="{LOGO["flame"]}"/></g>'
-            f'<g transform="translate(2 1166) scale(1 -1)"><path class="body" d="{LOGO["bet"]}"/></g>')
+def _letter_geom(key):
+    """A stream mark: a Hebrew letter with the CMI flame above it. Returns (viewBox, inner svg)."""
+    g = LOGO['letters'][key]; x0, y0, x1, y1 = g['bounds']
+    w, h = x1 - x0, y1 - y0
+    W = max(w, 200) + 40; cx = W / 2
+    glyph_dx = cx - (x0 + x1) / 2
+    # the flame sits over the letter's centre, or on top of the staff for Lamed
+    fx = (g['top_x'] + glyph_dx) if key == 'lamed' else cx
+    top = 520
+    H = top + h + 14
+    inner = (f'<g transform="translate({fx:.1f} 22) scale(1.25) translate(-768 -241)"><path class="flame" d="{LOGO["flame"]}"/></g>'
+             f'<g transform="translate({glyph_dx:.1f} {top + y1:.1f}) scale(1 -1)"><path class="body" d="{g["d"]}"/></g>')
+    return f'0 0 {W:.0f} {H:.0f}', inner, fx
 
-def mark(cls='', label=None, still=False):
-    """The Believers Country mark: the Bet with the living flame."""
+def letter_mark(key, cls='', label=None, still=False):
+    view, inner, fx = _letter_geom(key)
     aria = f'role="img" aria-label="{e(label)}"' if label else 'aria-hidden="true"'
     if still:
-        return f'<svg class="mark bc still {cls}" viewBox="{BC_VIEW}" {aria} focusable="false">{_bc_paths()}</svg>'
-    return (f'<span class="mark-float {cls}"><span class="mark-spin"><svg class="mark bc" viewBox="{BC_VIEW}" {aria} focusable="false">'
-            f'<ellipse class="flame-halo" cx="260" cy="300" rx="230" ry="300" fill="url(#flameHalo)"/>{_bc_paths()}</svg></span></span>')
+        return f'<svg class="mark bc still {cls}" viewBox="{view}" {aria} focusable="false">{inner}</svg>'
+    vy = view.split()[1]
+    return (f'<span class="mark-float {cls}"><span class="mark-spin"><svg class="mark bc" viewBox="{view}" {aria} focusable="false">'
+            f'<ellipse class="flame-halo" cx="{fx:.0f}" cy="{float(vy) + 300:.0f}" rx="230" ry="300" fill="url(#flameHalo)"/>{inner}</svg></span></span>')
+
+def mark(cls='', label=None, still=False):
+    """The Believers Country mark: the Bet (house) with the living flame."""
+    return letter_mark('bet', cls, label, still)
 
 def cmi_mark(cls='', label=None, still=False):
     """The Country Ministries International logo."""
@@ -171,17 +184,21 @@ def cmi_mark(cls='', label=None, still=False):
 # Four top-level items. Two of them open a short menu.
 NAV = [
     ('about/', 'About', ['about'], None),
-    ('cmi/', 'CMI', ['cmi'], None),
-    (None, 'Ministries', ['ministries', 'encounters', 'spiritual-intent', 'year'], [
-        ('ministries/', 'CMI ministry expressions', 'Four streams, one river'),
-        ('encounters/', 'Weekly encounters', 'Wednesday, Thursday, Shabbat'),
+    (None, 'Ministries', ['encounters', 'listen'], [
+        ('encounters/school-of-scriptures/', 'School of Scriptures', 'Wednesdays · 6 PM · study'),
+        ('encounters/ministering-to-the-lord/', 'Ministering to the LORD', 'Thursdays · 6 PM · prayer'),
+        ('encounters/shabbat-service/', 'Shabbat Service', 'Saturdays · 8 AM'),
+        ('listen/2-minutes/', '2 Minutes', 'A new word every evening')]),
+    (None, 'Listen & Learn', ['teachings', 'spiritual-intent', 'year'], [
+        ('teachings/', 'Shabbat teachings', 'Read or listen, Sabbath by Sabbath'),
         ('spiritual-intent/', 'Spiritual Intent', 'Books and study'),
         ('year-5787/', 'The Year 5787', 'Tav, Shin, Pe, Zayin')]),
-    (None, 'Listen & Learn', ['listen', 'teachings'], [
-        ('listen/2-minutes/', 'The listening room', '2 Minutes Podcast and Shabbat audio'),
-        ('teachings/', 'Shabbat teachings', 'Thirteen Sabbaths celebrating the Son')]),
     ('contact/', 'Contact', ['contact'], None),
+    ('cmi/', 'CMI', ['cmi', 'ministries'], None),
 ]
+
+# The CMI page has its own header: the CMI logo and a walk through the page.
+CMI_NAV = [('#who', 'Who we are'), ('#streams', 'Four streams'), ('#work', 'What we do'), ('#partner', 'Partner')]
 
 def toggle():
     return ('<button class="horizon" type="button" data-experience aria-label="Experience: Auto. Switch to Day.">'
@@ -190,6 +207,8 @@ def toggle():
             '<span class="sr-only" aria-live="polite" data-experience-live></span>')
 
 def header(r, section):
+    if section == 'cmi':
+        return cmi_header(r)
     chev = '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>'
     top, drawer = [], [f'<a class="d-link" href="{r or "./"}">Home</a>']
     for i, (href, label, keys, items) in enumerate(NAV):
@@ -212,13 +231,26 @@ def header(r, section):
 </div></div></header>
 <div class="drawer" id="drawer" hidden><nav aria-label="Menu">{''.join(drawer)}</nav><div class="drawer-share">{share_app(r, 'button gold', 'Share the 2 Minutes app')}</div></div>'''
 
+def cmi_header(r):
+    top = ''.join(f'<a class="nav-item" href="{h}">{t}</a>' for h, t in CMI_NAV)
+    drawer = ''.join(f'<a class="d-link" href="{h}">{t}</a>' for h, t in CMI_NAV)
+    home = f'<a class="nav-item bc-link" href="{r or "./"}">{mark(still=True)}Believers Country</a>'
+    return f'''<a class="skip" href="#main">Skip to content</a>
+<header class="site-header cmi-header"><div class="container"><div class="bar">
+<a class="brand" href="#top" aria-label="Country Ministries International">{cmi_mark(still=True)}<span class="brand-words"><strong><span>Country Ministries</span><span>International</span></strong><small>CMI</small></span></a>
+<nav class="primary-nav" aria-label="On this page">{top}{home}</nav>
+<div class="header-actions">{toggle()}<a class="button gold join" href="#partner">Partner {I['arrow']}</a>
+<button class="menu-button" id="menu-button" type="button" aria-expanded="false" aria-controls="drawer" aria-label="Open menu"><i></i><i></i></button></div>
+</div></div></header>
+<div class="drawer" id="drawer" hidden><nav aria-label="On this page">{drawer}<a class="d-link" href="{r or './'}">Believers Country <small>Home</small></a></nav></div>'''
+
 def footer(r):
     return f'''<footer class="footer"><div class="container">
 <div class="footer-grid">
 <div><a class="footer-brand" href="{r or './'}">{mark()}<span class="brand-words"><strong><span>Believers</span><span>Country</span></strong><small>CMI</small></span></a>
 <p>A people belonging to the Father. A life received in the Son. A country expressed through His Spirit.</p>
 <div class="socials">{share_app(r, 'icon-btn', '<span class="sr-only">Share the 2 Minutes app</span>')}<a href="{LINKS['youtube']}" target="_blank" rel="noopener" aria-label="Believers Country on YouTube">{I['youtube']}</a><a href="{LINKS['shabbat']}" target="_blank" rel="noopener" aria-label="Join the Shabbat Service WhatsApp group">{I['whatsapp']}</a><a href="mailto:{EMAIL}" aria-label="Email Country Ministries International">{I['mail']}</a></div></div>
-<div class="footer-col"><h4>Discover</h4><a href="{r}about/">Who we are</a><a href="{r}cmi/">Country Ministries International</a><a href="{r}ministries/">Four ministry streams</a><a href="{r}year-5787/">The Year 5787</a><a href="{r}contact/">Contact</a><a href="{r}contact/#give">Give · Partner</a></div>
+<div class="footer-col"><h4>Discover</h4><a href="{r}about/">Who we are</a><a href="{r}cmi/">Country Ministries International</a><a href="{r}cmi/#streams">Four ministry streams</a><a href="{r}year-5787/">The Year 5787</a><a href="{r}contact/">Contact</a><a href="{r}contact/#give">Give · Partner</a></div>
 <div class="footer-col"><h4>Gather</h4><a href="{r}encounters/school-of-scriptures/">School of Scriptures · Wed</a><a href="{r}encounters/ministering-to-the-lord/">Ministering to the LORD · Thu</a><a href="{r}encounters/shabbat-service/">Shabbat Service · Sat</a></div>
 <div class="footer-col"><h4>Listen &amp; read</h4><a href="{r}listen/2-minutes/">2 Minutes Podcast</a><a href="{r}app/">The 2 Minutes app</a><a href="{r}teachings/">Shabbat teachings</a><a href="{r}spiritual-intent/">Spiritual Intent</a><a href="{LINKS['youtube']}" target="_blank" rel="noopener">YouTube channel</a></div>
 </div>
@@ -275,11 +307,11 @@ def page(path, title, desc, body, section='', jsonld=None, extra_head='', out_fi
     is_app = path.startswith('listen/') or path.startswith('app/')
     og_img = 'assets/og-app.png' if is_app else 'assets/og-cmi.png' if path.startswith('cmi/') else 'assets/og-image.png'
     og_alt = 'The 2 Minutes app · Believers Country' if is_app else 'Believers Country — Country Ministries International'
-    touch = 'assets/apple-touch-icon-app.png' if is_app else 'assets/apple-touch-icon.png'
+    touch = 'assets/apple-touch-icon-app.png?v=3'
     # Every page uses the 2 Minutes app icon (the ב with the flame) as its tab icon, so sharing from
     # anywhere on the site shows the app icon. (Previous day/night CMI tab icons: TAB_ICONS.)
-    icons = (f'<link rel="icon" href="{r}assets/app-icon-192.png" type="image/png" sizes="192x192">'
-             f'<link rel="icon" href="{r}assets/app-icon-512.png" type="image/png" sizes="512x512">')
+    icons = (f'<link rel="icon" href="{r}assets/app-icon-192.png?v=3" type="image/png" sizes="192x192">'
+             f'<link rel="icon" href="{r}assets/app-icon-512.png?v=3" type="image/png" sizes="512x512">')
     eps = json.dumps([{k: ep[k] for k in ('slug', 'title', 'date', 'audio', 'path', 'seconds', 'label')} for ep in EPISODES])
     doc = f'''<!DOCTYPE html>
 <html lang="en" class="no-js" data-mode="system" data-theme="day" data-root="{r}">
@@ -339,7 +371,7 @@ def crumbs(r, trail):
     return f'<nav class="crumbs" aria-label="Breadcrumb">{items}</nav>'
 
 # Breadcrumb names for parent pages — the same label each page carries as its own crumb.
-CRUMB = {'ministries/': 'CMI ministry expressions', 'encounters/': 'Weekly encounters', 'listen/2-minutes/': 'The listening room',
+CRUMB = {'cmi/': 'Country Ministries International', 'ministries/': 'CMI ministry expressions', 'encounters/': 'Weekly encounters', 'listen/2-minutes/': 'The listening room',
          'teachings/': 'Shabbat teachings', 'spiritual-intent/': 'Spiritual Intent'}
 
 def page_hero(r, trail, eyebrow, h1, lead, chips=None, side=True, aside=''):
@@ -564,9 +596,11 @@ def year_teaser(r):
 
 # ------------------------------------------------------------------ CMI
 def cmi_page(r):
-    streams = ''.join(f'''<article class="card stream{' here' if s_['slug'] == 'believers-country' else ''}"><div class="icon-letter hebrew" aria-hidden="true">{s_['letter']}</div>
-<div class="kicker" style="margin-top:18px">0{i+1} · {s_['tag']} · {s_['river']}</div><h3><a class="card-link" href="{r}ministries/{s_['slug']}/">{s_['name']}</a></h3><p>{s_['line']}</p>
-{'<span class="badge latest here-badge">You are here</span>' if s_['slug'] == 'believers-country' else ''}<span class="more textlink">Explore {s_['name']} <span class="arr">→</span></span></article>''' for i, s_ in enumerate(STREAMS))
+    keys = {'believers-country': 'bet', 'school-of-scriptures': 'lamed', 'commonwealth': 'samekh', 'country-vanguard': 'gimel'}
+    streams = ''.join(f'''<article class="card stream{' here' if s_['slug'] == 'believers-country' else ''}"><div class="stream-mark">{letter_mark(keys[s_['slug']], label=s_['name'] + ' mark')}</div>
+<div class="kicker">{s_['tag']}</div><svg class="wave" viewBox="0 0 200 46" preserveAspectRatio="none" aria-hidden="true"><path d="M0 23 C25 5 50 41 75 23 S125 5 150 23 S175 41 200 23"/><path d="M0 30 C25 14 50 46 75 30 S125 14 150 30 S175 46 200 30"/></svg>
+<div class="river-name">{s_['river']}</div><h3><a class="card-link" href="{r}ministries/{s_['slug']}/">{s_['name']}</a></h3><p>{s_['line']}</p>
+{'<span class="badge latest here-badge">You are here</span>' if s_['slug'] == 'believers-country' else ''}<span class="more textlink">Explore <span class="arr">→</span></span></article>''' for i, s_ in enumerate(STREAMS))
     work = [('encounters/', 'Weekly encounters', 'School of Scriptures, Ministering to the LORD and Shabbat Service, every week.', I['cal']),
             ('listen/2-minutes/', 'The 2 Minutes app', 'A new word every evening at 6 PM. Listen, subscribe, and share the app.', I['headphones']),
             ('teachings/', 'Shabbat teachings', 'Thirteen Sabbaths celebrating the Son, to read or listen to in full.', I['book']),
@@ -637,7 +671,7 @@ def next_steps(r, items, title='Where to <em>next.</em>'):
 
 # ------------------------------------------------------------------ MINISTRIES
 def ministries(r):
-    rows = ''.join(f'''<article class="card stream"><div class="icon-letter hebrew" aria-hidden="true">{s['letter']}</div><div class="kicker" style="margin-top:18px">0{i+1} · {s['tag']} · {s['river']}</div>
+    rows = ''.join(f'''<article class="card stream"><div class="icon-letter hebrew" aria-hidden="true">{s['letter']}</div><div class="kicker" style="margin-top:18px">{s['tag']} · {s['river']}</div>
 <h3><a class="card-link" href="{r}ministries/{s['slug']}/">{s['name']}</a></h3><p>{s['line']}</p><div class="facts small"><div><span>Burden</span><b>{s['burden']}</b></div><div><span>Fruit</span><b>{s['output']}</b></div></div><span class="more textlink">Explore {s['name']} <span class="arr">→</span></span></article>''' for i, s in enumerate(STREAMS))
     return page_hero(r, [(None, 'Ministries')], 'CMI ministry expressions', 'One river, <em>four streams.</em>',
                      'Distinct expressions of life and service, built on one foundation in Christ.', [(f'#{s["slug"]}', s['name']) for s in STREAMS]) + f'''
@@ -652,7 +686,7 @@ def stream_page(s, idx):
     def body(r):
         others = [x for x in STREAMS if x is not s]
         struct = ''.join(f'<li><span><b>{a}</b><span>{b}</span></span></li>' for a, b in s['structure'])
-        return page_hero(r, [('ministries/', 'Ministries'), (None, s['name'])], f"0{idx+1} · {s['tag']} · {s['river']}", s['name'], s['line'],
+        return page_hero(r, [('cmi/', 'CMI'), (None, s['name'])], f"{s['tag']} · {s['river']}", s['name'], s['line'],
                          [('#about', 'About this stream'), ('#shape', 'How it works'), ('#gather', 'Take part')]) + f'''
 <section class="section tight" id="about"><div class="container article"><div class="prose reveal">{''.join(f'<p>{p}</p>' for p in s['body'])}
 <h2 id="shape">How it <em>works.</em></h2><ol class="steps clean">{struct}</ol></div>
@@ -977,9 +1011,9 @@ def write_app_files():
                 'description': 'A new word every evening from Believers Country. Listen, download and share.',
                 'start_url': '/listen/2-minutes/?source=app', 'scope': '/', 'display': 'standalone', 'orientation': 'portrait',
                 'background_color': '#f7f2e6', 'theme_color': '#f7f2e6', 'categories': ['lifestyle', 'education', 'books'],
-                'icons': [{'src': '/assets/app-icon-192.png', 'sizes': '192x192', 'type': 'image/png'},
-                          {'src': '/assets/app-icon-512.png', 'sizes': '512x512', 'type': 'image/png'},
-                          {'src': '/assets/app-icon-maskable-512.png', 'sizes': '512x512', 'type': 'image/png', 'purpose': 'maskable'}],
+                'icons': [{'src': '/assets/app-icon-192.png?v=3', 'sizes': '192x192', 'type': 'image/png'},
+                          {'src': '/assets/app-icon-512.png?v=3', 'sizes': '512x512', 'type': 'image/png'},
+                          {'src': '/assets/app-icon-maskable-512.png?v=3', 'sizes': '512x512', 'type': 'image/png', 'purpose': 'maskable'}],
                 'shortcuts': [{'name': 'Today’s 2 minutes', 'url': '/listen/2-minutes/?source=app#today'},
                               {'name': 'Shabbat teachings', 'url': '/teachings/'}]}
     (ROOT / 'manifest.webmanifest').write_text(json.dumps(manifest, ensure_ascii=False, indent=1))
@@ -992,7 +1026,7 @@ def main():
     page('cmi/', 'Country Ministries International', 'Country Ministries International (CMI): the ministry behind Believers Country, with four streams — Believers Country, School of Scriptures, Commonwealth and Country Vanguard.', cmi_page, 'cmi',
          {'@type': 'AboutPage', 'name': 'Country Ministries International', 'about': {'@id': SITE_URL + '#org'}})
     page('about/', 'About', 'Who we are: a people belonging to the Father, a life received in the Son, a country expressed through His Spirit.', about, 'about')
-    page('ministries/', 'Ministries', 'The four streams of CMI: Believers Country, School of Scriptures, Commonwealth and Country Vanguard.', ministries, 'ministries')
+    # ministries/ now lives on the CMI page (written as a redirect below)
     for i, s in enumerate(STREAMS): stream_page(s, i)
     page('encounters/', 'Weekly encounters', 'School of Scriptures on Wednesday, Ministering to the LORD on Thursday and Shabbat Service on Saturday — join on WhatsApp.', encounters, 'encounters')
     for i, x in enumerate(ENCOUNTERS): encounter_page(x, i)
@@ -1011,6 +1045,7 @@ def main():
     page('contact/', 'Contact', 'Connect with Believers Country through our WhatsApp communities and YouTube channel.', contact)
     legal('privacy'); legal('terms')
     write_app_files()
+    (ROOT / 'ministries/index.html').write_text('<!DOCTYPE html><meta charset="utf-8"><title>Four streams | Country Ministries International</title><meta name="robots" content="noindex"><meta http-equiv="refresh" content="0; url=../cmi/#streams"><link rel="canonical" href="' + SITE_URL + 'cmi/"><p>Moved to <a href="../cmi/#streams">Country Ministries International</a>.</p>')
     # legacy route kept as a redirect
     (ROOT / 'ministries/country-commonwealth/index.html').write_text('<!DOCTYPE html><meta charset="utf-8"><title>Commonwealth | Believers Country</title><meta name="robots" content="noindex"><meta http-equiv="refresh" content="0; url=../commonwealth/"><link rel="canonical" href="https://believerscountry.org/ministries/commonwealth/"><p>Moved to <a href="../commonwealth/">Commonwealth</a>.</p>')
     def prio(p):
