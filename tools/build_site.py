@@ -193,17 +193,17 @@ def header(r, section):
 <div class="header-actions">{toggle()}<a class="button gold join" href="{r}encounters/">Join us {I['arrow']}</a>
 <button class="menu-button" id="menu-button" type="button" aria-expanded="false" aria-controls="drawer" aria-label="Open menu"><i></i><i></i></button></div>
 </div></div></header>
-<div class="drawer" id="drawer" hidden><nav aria-label="Menu">{''.join(drawer)}</nav></div>'''
+<div class="drawer" id="drawer" hidden><nav aria-label="Menu">{''.join(drawer)}</nav><div class="drawer-share">{share_app(r, 'button gold', 'Share the 2 Minutes app')}</div></div>'''
 
 def footer(r):
     return f'''<footer class="footer"><div class="container">
 <div class="footer-grid">
 <div><a class="footer-brand" href="{r or './'}">{mark()}<span class="brand-words"><strong><span>Believers</span><span>Country</span></strong><small>CMI</small></span></a>
 <p>A people belonging to the Father. A life received in the Son. A country expressed through His Spirit.</p>
-<div class="socials"><a href="{LINKS['youtube']}" target="_blank" rel="noopener" aria-label="Believers Country on YouTube">{I['youtube']}</a><a href="{LINKS['shabbat']}" target="_blank" rel="noopener" aria-label="Join the Shabbat Service WhatsApp group">{I['whatsapp']}</a><a href="mailto:{EMAIL}" aria-label="Email Country Ministries International">{I['mail']}</a></div></div>
+<div class="socials">{share_app(r, 'icon-btn', '<span class="sr-only">Share the 2 Minutes app</span>')}<a href="{LINKS['youtube']}" target="_blank" rel="noopener" aria-label="Believers Country on YouTube">{I['youtube']}</a><a href="{LINKS['shabbat']}" target="_blank" rel="noopener" aria-label="Join the Shabbat Service WhatsApp group">{I['whatsapp']}</a><a href="mailto:{EMAIL}" aria-label="Email Country Ministries International">{I['mail']}</a></div></div>
 <div class="footer-col"><h4>Discover</h4><a href="{r}about/">Who we are</a><a href="{r}ministries/">Four ministry streams</a><a href="{r}year-5787/">The Year 5787</a><a href="{r}contact/">Contact</a><a href="{r}contact/#give">Give · Partner</a></div>
 <div class="footer-col"><h4>Gather</h4><a href="{r}encounters/school-of-scriptures/">School of Scriptures · Wed</a><a href="{r}encounters/ministering-to-the-lord/">Ministering to the LORD · Thu</a><a href="{r}encounters/shabbat-service/">Shabbat Service · Sat</a></div>
-<div class="footer-col"><h4>Listen &amp; read</h4><a href="{r}listen/2-minutes/">2 Minutes Podcast</a><a href="{r}teachings/">Shabbat teachings</a><a href="{r}spiritual-intent/">Spiritual Intent</a><a href="{LINKS['youtube']}" target="_blank" rel="noopener">YouTube channel</a></div>
+<div class="footer-col"><h4>Listen &amp; read</h4><a href="{r}listen/2-minutes/">2 Minutes Podcast</a><a href="{r}app/">The 2 Minutes app</a><a href="{r}teachings/">Shabbat teachings</a><a href="{r}spiritual-intent/">Spiritual Intent</a><a href="{LINKS['youtube']}" target="_blank" rel="noopener">YouTube channel</a></div>
 </div>
 <div class="legal"><span>© <span data-year>2026</span> Country Ministries International · Believers Country. All rights reserved.</span><nav aria-label="Legal"><a href="{r}privacy/">Privacy Policy</a><a href="{r}terms/">Terms of Use</a><span>Times in WAT (Africa/Lagos)</span></nav></div>
 </div></footer>'''
@@ -243,6 +243,10 @@ def page(path, title, desc, body, section='', jsonld=None, extra_head='', out_fi
     for g in graph: g.pop('@context', None)
     ld = f'<script type="application/ld+json">{json.dumps({"@context": "https://schema.org", "@graph": graph}, ensure_ascii=False)}</script>' if graph else ''
     og_type = OG_TYPE.get(path.split('/')[0], 'website') if path.count('/') > 1 else 'website'
+    is_app = path.startswith('listen/') or path.startswith('app/')
+    og_img = 'assets/og-app.png' if is_app else 'assets/og-image.png'
+    og_alt = 'The 2 Minutes app · Believers Country' if is_app else 'Believers Country — Country Ministries International'
+    touch = 'assets/apple-touch-icon-app.png' if is_app else 'assets/apple-touch-icon.png'
     eps = json.dumps([{k: ep[k] for k in ('slug', 'title', 'date', 'audio', 'path', 'seconds', 'label')} for ep in EPISODES])
     doc = f'''<!DOCTYPE html>
 <html lang="en" class="no-js" data-mode="system" data-theme="day" data-root="{r}">
@@ -256,14 +260,14 @@ def page(path, title, desc, body, section='', jsonld=None, extra_head='', out_fi
 <meta name="robots" content="{'noindex' if out_file else 'index, follow, max-image-preview:large, max-snippet:-1'}">
 <meta name="author" content="Country Ministries International">
 <meta property="og:type" content="{og_type}"><meta property="og:site_name" content="Believers Country"><meta property="og:locale" content="en_NG"><meta property="og:title" content="{e(full_title)}"><meta property="og:description" content="{e(desc)}"><meta property="og:url" content="{url}">
-<meta property="og:image" content="{SITE_URL}assets/og-image.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Believers Country — Country Ministries International">
-<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="{e(full_title)}"><meta name="twitter:description" content="{e(desc)}"><meta name="twitter:image" content="{SITE_URL}assets/og-image.png">
+<meta property="og:image" content="{SITE_URL}{og_img}"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="{og_alt}">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="{e(full_title)}"><meta name="twitter:description" content="{e(desc)}"><meta name="twitter:image" content="{SITE_URL}{og_img}">
 <link rel="sitemap" type="application/xml" href="{SITE_URL}sitemap.xml">
 <script>(function(){{var d=document.documentElement,m='system';try{{m=localStorage.getItem('bc-experience-v3')||localStorage.getItem('bc-experience-v2')||'system'}}catch(e){{}}if(['day','night','system'].indexOf(m)<0)m='system';d.dataset.mode=m;d.dataset.theme=m==='system'?(matchMedia('(prefers-color-scheme: dark)').matches?'night':'day'):m}})()</script>
 <link rel="icon" href="{r}assets/favicon-day.svg" type="image/svg+xml" data-favicon="{r}assets/favicon-">
 <link rel="icon" href="{r}assets/favicon-cmi.png" type="image/png" sizes="192x192" data-favicon-png="{r}assets/favicon-cmi">
 <script>(function(){{var n=document.documentElement.dataset.theme==='night',a=document.querySelector('[data-favicon]'),b=document.querySelector('[data-favicon-png]');if(a)a.href=a.dataset.favicon+(n?'night':'day')+'.svg';if(b)b.href=b.dataset.faviconPng+(n?'-night':'')+'.png'}})()</script>
-<link rel="apple-touch-icon" href="{r}assets/apple-touch-icon.png">
+<link rel="apple-touch-icon" href="{r}{touch}">
 <link rel="manifest" href="{r}manifest.webmanifest">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="2 Minutes"><meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -325,8 +329,9 @@ def portrait(r):
             f'</div><span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span></div></div>'
             f'<figcaption><b>Seyi &amp; Shirley Ashiru</b></figcaption></figure>')
 
-def share_box(title, url):
-    return (f'<div class="share" data-share-title="{e(title)}" data-share-url="{url}"><button class="chip" type="button" data-share-toggle aria-expanded="false">{I["share"]} Share</button>'
+def share_box(title, url, label='Share', cls='chip', text='', direct=False):
+    extra = (f' data-share-text="{e(text)}"' if text else '') + (' data-share-direct' if direct else '')
+    return (f'<div class="share" data-share-title="{e(title)}" data-share-url="{url}"{extra}><button class="{cls}" type="button" data-share-toggle aria-expanded="false">{I["share"]} {label}</button>'
             '<div class="share-menu" hidden><button type="button" data-share="whatsapp">WhatsApp</button><button type="button" data-share="native">Device share</button>'
             '<button type="button" data-share="x">X / Twitter</button><button type="button" data-share="facebook">Facebook</button><button type="button" data-share="telegram">Telegram</button>'
             '<button type="button" data-share="email">Email</button><button type="button" data-share="copy">Copy link</button><p class="share-msg" role="status"></p></div></div>')
@@ -637,10 +642,15 @@ def archive_row(r, x, kind):
             f'<div class="arc-info"><span class="badge{" audio" if kind == "shabbat" else ""}">{label} · {x["label"]}</span>'
             f'<h3><a href="{r}{href}">{e(x["title"])}</a></h3><p>{e(sub)}</p></div>{player(r, x)}</article>')
 
+APP_SHARE_TEXT = 'Get the Believers Country 2 Minutes app: a new word every evening at 6 PM. Listen, download and share.'
+
+def share_app(r, cls='button ghost', label='Share the app'):
+    return share_box('The 2 Minutes app', r + 'app/', label, cls, APP_SHARE_TEXT, direct=True)
+
 def subscribe_section(r):
-    return f'''<section class="section tight" id="subscribe"><div class="container"><div class="panel subscribe reveal">
-<div class="sub-intro"><div class="icon-letter" aria-hidden="true">{I['bell']}</div><h2>Never miss <em>a word.</em></h2>
-<p class="lead">A new 2 Minutes word drops every evening at 6:00 PM, when the new day begins. Choose how you would like to hear about it.</p></div>
+    return f'''<section class="section tight" id="subscribe" style="padding-top:0"><div class="container">
+<div class="sub-bar reveal"><details class="sub-drop" data-sub-drop>
+<summary><span class="sub-ico">{I['bell']}</span><span class="sub-sum"><b data-sub-title>Would you like to be notified when a new word drops?</b><small data-sub-note>Email, the 2 Minutes app, or a reminder on this device</small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
 <div class="sub-ways">
 <form class="sub-card sub-email" data-subscribe data-endpoint="{SUBSCRIBE_URL}" data-fallback="{EMAIL}" novalidate>
 <div class="sub-head"><span class="sub-ico">{I['mail']}</span><div><b>Email me each new word</b><small>One short email when it drops. Unsubscribe any time.</small></div></div>
@@ -648,13 +658,14 @@ def subscribe_section(r):
 <label class="sr-only" for="sub-email">Email address</label><input id="sub-email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="you@example.com" required></div>
 <input type="text" name="website" tabindex="-1" autocomplete="off" class="hp" aria-hidden="true">
 <button class="button gold" type="submit">{I['mail']} Subscribe</button><p class="sub-msg small" role="status" aria-live="polite"></p></form>
-<div class="sub-card"><div class="sub-head"><span class="sub-ico">{I['phone']}</span><div><b>Get the 2 Minutes app</b><small>Add it to your home screen. It opens straight to today’s word, even on a weak connection.</small></div></div>
-<div class="sub-actions"><button class="button primary" type="button" data-install>{I['download']} Install the app</button>{share_box('2 Minutes · the Believers Country app', r + 'app/')}</div>
+<div class="sub-card"><div class="sub-head"><span class="sub-ico">{I['phone']}</span><div><b>Get the 2 Minutes app</b><small>Add it to your home screen. It opens straight to today’s word.</small></div></div>
+<div class="sub-actions"><button class="button primary" type="button" data-install>{I['download']} Install the app</button></div>
 <p class="sub-msg small" data-install-msg role="status" aria-live="polite"></p></div>
-<div class="sub-card"><div class="sub-head"><span class="sub-ico">{I['bell']}</span><div><b>Remind me on this device</b><small>An app notification when the new word is out, or a daily 6 PM reminder in your calendar.</small></div></div>
+<div class="sub-card"><div class="sub-head"><span class="sub-ico">{I['bell']}</span><div><b>Remind me on this device</b><small>A notification when the new word is out, or a daily 6 PM reminder in your calendar.</small></div></div>
 <div class="sub-actions"><button class="button ghost" type="button" data-notify>{I['bell']} Turn on notifications</button><button class="chip" type="button" data-ics="daily">{I['cal']} Daily calendar reminder</button><a class="chip" href="{SITE_URL}feed.xml">{I['rss']} Podcast feed</a></div>
 <p class="sub-msg small" data-notify-msg role="status" aria-live="polite"></p></div>
-</div></div></div></section>'''
+</div></details>
+<div class="sub-share">{share_app(r, 'button gold')}</div></div></div></section>'''
 
 def listen(r):
     ep = episode_for(SACRED)

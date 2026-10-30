@@ -307,7 +307,7 @@
       'DESCRIPTION:A new word is out. Listen: ' + appUrl, 'URL:' + appUrl, 'BEGIN:VALARM', 'ACTION:DISPLAY', 'DESCRIPTION:Today’s 2 minutes is out', 'TRIGGER:PT0M', 'END:VALARM', 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
     const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([txt], { type: 'text/calendar;charset=utf-8' })); a.download = '2-minutes-daily-reminder.ics';
     document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
-    const m = $('[data-notify-msg]'); if (m) m.textContent = 'Open the downloaded file to add a reminder at 6:05 PM every evening.';
+    const m = $('[data-notify-msg]'); if (m) m.textContent = 'Open the downloaded file to add a reminder at 6:05 PM every evening.'; markDone('cal');
   }));
   $$('[data-ics]').forEach(b => b.addEventListener('click', () => {
     const s = SESSIONS[b.dataset.ics]; if (!s) return;
@@ -366,11 +366,18 @@
   const closeShares = except => shares.forEach(s => { if (s !== except) { const m = $('.share-menu', s); if (m) m.hidden = true; $('[data-share-toggle]', s)?.setAttribute('aria-expanded', 'false'); } });
   shares.forEach(box => {
     const tg = $('[data-share-toggle]', box), menu = $('.share-menu', box), msg = $('.share-msg', box);
-    tg && tg.addEventListener('click', e => { e.stopPropagation(); const open = menu.hidden; closeShares(box); menu.hidden = !open; tg.setAttribute('aria-expanded', String(open)); });
+    tg && tg.addEventListener('click', async e => {
+      e.stopPropagation();
+      if (box.hasAttribute('data-share-direct') && navigator.share) {
+        const url = new URL(box.dataset.shareUrl || location.href, location.href).href;
+        try { await navigator.share({ title: box.dataset.shareTitle || document.title, text: box.dataset.shareText || '', url }); return; } catch (err) { if (err && err.name === 'AbortError') return; }
+      }
+      const open = menu.hidden; closeShares(box); menu.hidden = !open; tg.setAttribute('aria-expanded', String(open));
+    });
     $$('[data-share]', box).forEach(b => b.addEventListener('click', async () => {
       const url = new URL(box.dataset.shareUrl || location.href, location.href).href;
       const title = (box.dataset.shareTitle || document.title) + ' · Believers Country';
-      const u = encodeURIComponent(url), t = encodeURIComponent(title), p = b.dataset.share;
+      const u = encodeURIComponent(url), t = encodeURIComponent(box.dataset.shareText || title), p = b.dataset.share;
       if (p === 'native') { if (navigator.share) { try { await navigator.share({ title, url }); } catch (_) {} } else msg.textContent = 'Choose a platform below.'; return; }
       if (p === 'copy') { try { await navigator.clipboard.writeText(url); msg.textContent = 'Link copied.'; } catch (_) { msg.textContent = url; } return; }
       const links = { whatsapp: 'https://api.whatsapp.com/send?text=' + t + '%20' + u, x: 'https://twitter.com/intent/tweet?text=' + t + '&url=' + u, facebook: 'https://www.facebook.com/sharer/sharer.php?u=' + u, telegram: 'https://t.me/share/url?url=' + u + '&text=' + t, email: 'mailto:?subject=' + t + '&body=' + u };
@@ -434,7 +441,7 @@
       if ('periodicSync' in reg) {
         try { const st = await navigator.permissions.query({ name: 'periodic-background-sync' }); if (st.state === 'granted') { await reg.periodicSync.register('new-episode', { minInterval: 6 * 3600e3 }); periodic = true; } } catch (_) {}
       }
-      notifyBtn.textContent = 'Notifications are on';
+      notifyBtn.textContent = 'Notifications are on'; markDone('push');
       reg.showNotification('Notifications are on', { body: 'We will let you know when the next 2 Minutes word is out.', icon: ROOT + 'assets/app-icon-192.png', tag: 'bc-welcome' });
       say(notifyMsg, periodic ? 'Done. The app will check for each new word and notify you.'
         : 'Done. You will be notified when you open the app and a new word is waiting. For a reminder every evening, add the daily calendar reminder too.');
@@ -443,6 +450,26 @@
     if (canNotify && Notification.permission === 'granted') navigator.serviceWorker.ready.then(r => r.active && r.active.postMessage({ type: 'check' })).catch(() => {});
   }
 
+  const drop = $('[data-sub-drop]');
+  const markDone = what => {
+    try { const d = JSON.parse(localStorage.getItem('bc-notify') || '{}'); d[what] = 1; localStorage.setItem('bc-notify', JSON.stringify(d)); } catch (_) {}
+    paintDrop();
+  };
+  function paintDrop() {
+    if (!drop) return;
+    let d = {}; try { d = JSON.parse(localStorage.getItem('bc-notify') || '{}'); } catch (_) {}
+    if (standalone) d.app = 1;
+    if ('Notification' in window && Notification.permission === 'granted') d.push = 1;
+    const parts = [d.email && 'email', d.app && 'the app', d.push && 'notifications', d.cal && 'calendar'].filter(Boolean);
+    drop.classList.toggle('done', parts.length > 0);
+    if (parts.length) {
+      $('[data-sub-title]', drop).textContent = 'You are set up for each new word';
+      $('[data-sub-note]', drop).textContent = 'Through ' + parts.join(', ').replace(/, ([^,]*)$/, ' and $1') + ' · tap to manage';
+    }
+  }
+  paintDrop();
+  if (drop && new URLSearchParams(location.search).get('install') === '1') drop.open = true;
+  addEventListener('appinstalled', () => markDone('app'));
   const subForm = $('[data-subscribe]');
   if (subForm) subForm.addEventListener('submit', async e => {
     e.preventDefault();
@@ -458,7 +485,7 @@
     say(msg, 'Subscribing…');
     try {
       await fetch(endpoint, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ action: 'subscribe', email, name, source: location.pathname }) });
-      subForm.reset(); say(msg, 'You are subscribed. Check your inbox for a welcome email (and your spam folder, just in case).');
+      subForm.reset(); say(msg, 'You are subscribed. Check your inbox for a welcome email (and your spam folder, just in case).'); markDone('email');
       try { localStorage.setItem('bc-subscribed', '1'); } catch (_) {}
     } catch (_) { say(msg, 'That did not go through. Please check your connection and try again.'); }
     btn.disabled = false;

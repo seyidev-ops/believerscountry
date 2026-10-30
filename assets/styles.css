@@ -631,3 +631,32 @@ ul.clean{list-style:none;padding:0;margin:0}
 .button:disabled{opacity:.7;cursor:default;transform:none}
 @media (max-width:860px){.subscribe{grid-template-columns:minmax(0,1fr)}}
 @media (max-width:520px){.sub-row{grid-template-columns:minmax(0,1fr)}.sub-actions .button{flex:1 1 100%}}
+
+/* notification drop-down + share the app */
+.sub-bar{display:flex;gap:12px;align-items:flex-start}
+.sub-drop{flex:1;min-width:0;border-radius:20px;background:var(--surface);border:1px solid var(--line);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);transition:border-color .3s}
+.sub-drop[open]{border-color:var(--line2)}
+.sub-drop>summary{display:flex;align-items:center;gap:14px;padding:14px 18px;cursor:pointer;list-style:none}
+.sub-drop>summary::-webkit-details-marker{display:none}
+.sub-drop>summary .chev{width:20px;height:20px;margin-left:auto;flex-shrink:0;color:var(--gold);transition:transform .3s var(--ease)}
+.sub-drop[open]>summary .chev{transform:rotate(180deg)}
+.sub-sum{min-width:0}
+.sub-sum b{display:block;font:700 15px/1.3 var(--font-ui)}
+.sub-sum small{display:block;color:var(--muted);font-size:13px;margin-top:2px}
+.sub-drop.done .sub-ico{background:var(--btn);color:var(--btnInk);border-color:transparent}
+.sub-drop .sub-ways{padding:0 18px 18px}
+.sub-share{flex-shrink:0}
+.sub-share .button{min-height:58px}
+.icon-btn{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--line);background:none;cursor:pointer;color:inherit;transition:border-color .3s,color .3s,transform .3s}
+.icon-btn:hover{border-color:var(--gold2);color:var(--gold);transform:translateY(-2px)}
+.icon-btn svg{width:18px;height:18px}
+.socials .share-menu{left:0}
+.drawer-share{margin-top:26px}
+.drawer-share .share,.drawer-share .button{width:100%}
+.drawer-share .share-menu{bottom:auto;top:calc(100% + 8px);width:100%}
+@media (max-width:620px){
+  .sub-bar{flex-direction:column;align-items:stretch}
+  .sub-share .share,.sub-share .button{width:100%}
+  .sub-share .share-menu{bottom:auto;top:calc(100% + 8px)}
+  .sub-drop>summary{padding:13px 14px;gap:12px}
+}
