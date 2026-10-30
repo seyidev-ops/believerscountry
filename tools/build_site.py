@@ -252,9 +252,9 @@ def page(path, title, desc, body, section='', jsonld=None, extra_head='', out_fi
     ld = f'<script type="application/ld+json">{json.dumps({"@context": "https://schema.org", "@graph": graph}, ensure_ascii=False)}</script>' if graph else ''
     og_type = OG_TYPE.get(path.split('/')[0], 'website') if path.count('/') > 1 else 'website'
     is_app = path.startswith('listen/') or path.startswith('app/')
-    og_img = 'assets/og-image.png'  # app share card on hold until the new icon is agreed ('assets/og-app.png')
+    og_img = 'assets/og-app.png' if is_app else 'assets/og-image.png'
     og_alt = 'The 2 Minutes app · Believers Country' if is_app else 'Believers Country — Country Ministries International'
-    touch = 'assets/apple-touch-icon.png'  # app icon on hold until agreed ('assets/apple-touch-icon-app.png')
+    touch = 'assets/apple-touch-icon-app.png' if is_app else 'assets/apple-touch-icon.png'
     eps = json.dumps([{k: ep[k] for k in ('slug', 'title', 'date', 'audio', 'path', 'seconds', 'label')} for ep in EPISODES])
     doc = f'''<!DOCTYPE html>
 <html lang="en" class="no-js" data-mode="system" data-theme="day" data-root="{r}">
