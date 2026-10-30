@@ -681,3 +681,28 @@ ul.clean{list-style:none;padding:0;margin:0}
 .refresh-fab:hover .refresh-tip,.refresh-fab:focus-visible .refresh-tip{opacity:1;transform:translate(0,-50%)}
 .refresh-fab.spinning svg{animation:rotate .7s linear infinite}
 @media print{.refresh-fab{display:none}}
+
+/* Believers Country mark (ב with the flame) and the CMI page */
+.mark.bc .body{fill:currentColor}
+.brand .mark.bc{width:22px;height:50px}
+.hero-mark .mark.bc{width:min(210px,44vw)}
+.page-hero .side-mark .mark.bc{width:96px}
+.footer-brand .mark.bc{width:40px}
+.cmi-hero-mark .mark{width:min(260px,56vw)}
+.cmi-band{flex-direction:row;align-items:center;gap:clamp(20px,4vw,48px);padding:clamp(24px,3.4vw,44px)}
+.cmi-band-mark{flex-shrink:0;width:clamp(90px,12vw,140px);color:var(--ink)}
+.cmi-band-mark .mark{width:100%;height:auto}
+.cmi-band h2{font-size:clamp(30px,3.6vw,46px)}
+.cmi-band .textlink{position:relative;z-index:2}
+.stream.here{border-color:var(--gold2);background:linear-gradient(150deg,color-mix(in srgb,var(--gold2) 14%,var(--surface)),var(--surface) 60%)}
+.here-badge{align-self:flex-start;margin:-2px 0 6px}
+@media (max-width:860px){
+  .hero-mark .mark.bc{width:118px}
+  .cmi-hero-mark{order:-1}
+  .cmi-hero-mark .mark{width:150px}
+}
+@media (max-width:620px){
+  .cmi-band{flex-direction:column;align-items:flex-start}
+  .cmi-band-mark{width:96px}
+}
+.callband h2 em{background:none;-webkit-background-clip:border-box;background-clip:border-box;color:inherit;-webkit-text-fill-color:currentColor;animation:none;opacity:.9}

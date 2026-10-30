@@ -142,7 +142,22 @@ DEFS = '''<svg width="0" height="0" style="position:absolute" aria-hidden="true"
 <linearGradient id="cityGlow" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe7a6" stop-opacity=".95"/><stop offset=".5" stop-color="#e8c46f" stop-opacity=".55"/><stop offset="1" stop-color="#7cd8dc" stop-opacity=".1"/></linearGradient>
 </defs></svg>'''
 
+BC_VIEW = '0 0 520 1180'
+def _bc_paths():
+    # flame from the CMI logo, scaled and set above the Hebrew letter Bet (FreeSerif Bold outline, y flipped)
+    return (f'<g transform="translate(260 22) scale(1.25) translate(-768 -241)"><path class="flame" d="{LOGO["flame"]}"/></g>'
+            f'<g transform="translate(2 1166) scale(1 -1)"><path class="body" d="{LOGO["bet"]}"/></g>')
+
 def mark(cls='', label=None, still=False):
+    """The Believers Country mark: the Bet with the living flame."""
+    aria = f'role="img" aria-label="{e(label)}"' if label else 'aria-hidden="true"'
+    if still:
+        return f'<svg class="mark bc still {cls}" viewBox="{BC_VIEW}" {aria} focusable="false">{_bc_paths()}</svg>'
+    return (f'<span class="mark-float {cls}"><span class="mark-spin"><svg class="mark bc" viewBox="{BC_VIEW}" {aria} focusable="false">'
+            f'<ellipse class="flame-halo" cx="260" cy="300" rx="230" ry="300" fill="url(#flameHalo)"/>{_bc_paths()}</svg></span></span>')
+
+def cmi_mark(cls='', label=None, still=False):
+    """The Country Ministries International logo."""
     aria = f'role="img" aria-label="{e(label)}"' if label else 'aria-hidden="true"'
     if still:
         return (f'<svg class="mark still {cls}" viewBox="{LOGO["viewBox"]}" {aria} focusable="false">'
@@ -156,6 +171,7 @@ def mark(cls='', label=None, still=False):
 # Four top-level items. Two of them open a short menu.
 NAV = [
     ('about/', 'About', ['about'], None),
+    ('cmi/', 'CMI', ['cmi'], None),
     (None, 'Ministries', ['ministries', 'encounters', 'spiritual-intent', 'year'], [
         ('ministries/', 'CMI ministry expressions', 'Four streams, one river'),
         ('encounters/', 'Weekly encounters', 'Wednesday, Thursday, Shabbat'),
@@ -202,7 +218,7 @@ def footer(r):
 <div><a class="footer-brand" href="{r or './'}">{mark()}<span class="brand-words"><strong><span>Believers</span><span>Country</span></strong><small>CMI</small></span></a>
 <p>A people belonging to the Father. A life received in the Son. A country expressed through His Spirit.</p>
 <div class="socials">{share_app(r, 'icon-btn', '<span class="sr-only">Share the 2 Minutes app</span>')}<a href="{LINKS['youtube']}" target="_blank" rel="noopener" aria-label="Believers Country on YouTube">{I['youtube']}</a><a href="{LINKS['shabbat']}" target="_blank" rel="noopener" aria-label="Join the Shabbat Service WhatsApp group">{I['whatsapp']}</a><a href="mailto:{EMAIL}" aria-label="Email Country Ministries International">{I['mail']}</a></div></div>
-<div class="footer-col"><h4>Discover</h4><a href="{r}about/">Who we are</a><a href="{r}ministries/">Four ministry streams</a><a href="{r}year-5787/">The Year 5787</a><a href="{r}contact/">Contact</a><a href="{r}contact/#give">Give · Partner</a></div>
+<div class="footer-col"><h4>Discover</h4><a href="{r}about/">Who we are</a><a href="{r}cmi/">Country Ministries International</a><a href="{r}ministries/">Four ministry streams</a><a href="{r}year-5787/">The Year 5787</a><a href="{r}contact/">Contact</a><a href="{r}contact/#give">Give · Partner</a></div>
 <div class="footer-col"><h4>Gather</h4><a href="{r}encounters/school-of-scriptures/">School of Scriptures · Wed</a><a href="{r}encounters/ministering-to-the-lord/">Ministering to the LORD · Thu</a><a href="{r}encounters/shabbat-service/">Shabbat Service · Sat</a></div>
 <div class="footer-col"><h4>Listen &amp; read</h4><a href="{r}listen/2-minutes/">2 Minutes Podcast</a><a href="{r}app/">The 2 Minutes app</a><a href="{r}teachings/">Shabbat teachings</a><a href="{r}spiritual-intent/">Spiritual Intent</a><a href="{LINKS['youtube']}" target="_blank" rel="noopener">YouTube channel</a></div>
 </div>
@@ -215,7 +231,7 @@ ORG = {'@type': ['Organization', 'Church'], '@id': SITE_URL + '#org', 'name': 'C
        'address': {'@type': 'PostalAddress', 'addressCountry': 'NG'}, 'email': EMAIL, 'sameAs': [LINKS['youtube']]}
 CRUMB_NAMES = {'about': 'About', 'ministries': 'CMI ministry expressions', 'encounters': 'Weekly encounters', 'listen': 'Listen', '2-minutes': 'The listening room',
                'teachings': 'Shabbat teachings', 'spiritual-intent': 'Spiritual Intent', 'books': 'Money Under God', 'year-5787': 'The Year 5787',
-               'contact': 'Contact', 'privacy': 'Privacy Policy', 'terms': 'Terms of Use'}
+               'contact': 'Contact', 'privacy': 'Privacy Policy', 'terms': 'Terms of Use', 'cmi': 'Country Ministries International'}
 OG_TYPE = {'teachings': 'article', 'listen': 'article'}
 
 TAB_ICONS = '''<link rel="icon" href="{r}assets/favicon-day.svg" type="image/svg+xml" data-favicon="{r}assets/favicon-">
@@ -257,7 +273,7 @@ def page(path, title, desc, body, section='', jsonld=None, extra_head='', out_fi
     ld = f'<script type="application/ld+json">{json.dumps({"@context": "https://schema.org", "@graph": graph}, ensure_ascii=False)}</script>' if graph else ''
     og_type = OG_TYPE.get(path.split('/')[0], 'website') if path.count('/') > 1 else 'website'
     is_app = path.startswith('listen/') or path.startswith('app/')
-    og_img = 'assets/og-app.png' if is_app else 'assets/og-image.png'
+    og_img = 'assets/og-app.png' if is_app else 'assets/og-cmi.png' if path.startswith('cmi/') else 'assets/og-image.png'
     og_alt = 'The 2 Minutes app · Believers Country' if is_app else 'Believers Country — Country Ministries International'
     touch = 'assets/apple-touch-icon-app.png' if is_app else 'assets/apple-touch-icon.png'
     # Every page uses the 2 Minutes app icon (the ב with the flame) as its tab icon, so sharing from
@@ -522,9 +538,11 @@ def home(r):
 <a class="button ghost" style="position:relative;z-index:2;align-self:flex-start" href="{r}spiritual-intent/books/">{I['book']} See the collection</a></article>
 </div></section>
 
-<section class="section"><div class="container">
-<div class="section-head reveal"><div><div class="eyebrow">CMI ministry expressions</div><h2>One river, <em>four streams.</em></h2><p class="lead">A river went out of Eden and parted into four heads (Genesis 2:10). Our ministries are distinct in function and one in source.</p></div><a class="textlink" href="{r}ministries/">All ministries <span class="arr">→</span></a></div>
-<div class="grid g4 reveal-stagger">{streams}</div></div></section>
+<section class="section tight"><div class="container"><a class="card cmi-band reveal" href="{r}cmi/">
+<div class="cmi-band-mark" aria-hidden="true">{cmi_mark(still=True)}</div>
+<div><div class="kicker">Part of Country Ministries International</div><h2 style="margin:8px 0 10px">One river, <em>four streams.</em></h2>
+<p>Believers Country is the communal home of Country Ministries International (CMI), alongside School of Scriptures, Commonwealth and Country Vanguard. Meet the whole ministry.</p>
+<span class="textlink">Discover CMI <span class="arr">→</span></span></div></a></div></section>
 
 {year_teaser(r)}
 
@@ -543,6 +561,42 @@ def year_teaser(r):
     mv = ''.join(f'<div data-m="{m}">{m}<small>{a} · {b}</small></div>' for m, a, b in MOVES)
     return f'''<section class="section tight"><div class="container"><div class="section-head reveal"><div><div class="eyebrow">The year 5787 · <span class="hebrew">ה׳תשפ״ז</span></div><h2>The year of the <em>crowned mouth.</em></h2><p class="lead">Mark, fire, mouth, sword. Ownership precedes formation; formation precedes speech; speech precedes authority (Isaiah 49:2).</p></div><a class="textlink" href="{r}year-5787/">Walk through the year <span class="arr">→</span></a></div>
 <div class="letters reveal-stagger">{cards}</div><div class="movement-bar reveal" aria-label="The four movements of 5787">{mv}</div></div></section>'''
+
+# ------------------------------------------------------------------ CMI
+def cmi_page(r):
+    streams = ''.join(f'''<article class="card stream{' here' if s_['slug'] == 'believers-country' else ''}"><div class="icon-letter hebrew" aria-hidden="true">{s_['letter']}</div>
+<div class="kicker" style="margin-top:18px">0{i+1} · {s_['tag']} · {s_['river']}</div><h3><a class="card-link" href="{r}ministries/{s_['slug']}/">{s_['name']}</a></h3><p>{s_['line']}</p>
+{'<span class="badge latest here-badge">You are here</span>' if s_['slug'] == 'believers-country' else ''}<span class="more textlink">Explore {s_['name']} <span class="arr">→</span></span></article>''' for i, s_ in enumerate(STREAMS))
+    work = [('encounters/', 'Weekly encounters', 'School of Scriptures, Ministering to the LORD and Shabbat Service, every week.', I['cal']),
+            ('listen/2-minutes/', 'The 2 Minutes app', 'A new word every evening at 6 PM. Listen, subscribe, and share the app.', I['headphones']),
+            ('teachings/', 'Shabbat teachings', 'Thirteen Sabbaths celebrating the Son, to read or listen to in full.', I['book']),
+            ('spiritual-intent/', 'Spiritual Intent', 'Books for careful, Christ-centred study, starting with Money Under God.', I['book'])]
+    w = ''.join(f'<article class="card"><span class="sub-ico" aria-hidden="true">{ic}</span><h3 style="margin-top:16px"><a class="card-link" href="{r}{h}">{t}</a></h3><p>{d}</p><span class="more textlink">Open <span class="arr">→</span></span></article>' for h, t, d, ic in work)
+    hero = f'''<section class="page-hero with-aside"><div class="container hero-split"><div class="reveal">{crumbs(r, [(None, 'Country Ministries International')])}
+<h1>Country Ministries <em>International.</em></h1>
+<p class="lead">The ministry behind Believers Country. One river with four streams: a people belonging to the Father, a life received in the Son, a country expressed through His Spirit.</p>
+<div class="on-page"><a class="chip" href="#who">Who we are</a><a class="chip" href="#streams">Four streams</a><a class="chip" href="#work">What we do</a><a class="chip" href="#partner">Partner with us</a></div></div>
+<div class="hero-mark cmi-hero-mark" aria-hidden="true"><span class="halo-rays"></span><span class="orbit-ring two"></span><span class="orbit-ring"></span>{cmi_mark()}</div></div></section>'''
+    return hero + f'''
+<section class="section tight" id="who"><div class="container grid g2" style="gap:clamp(30px,6vw,80px)">
+<div class="reveal"><div class="eyebrow">Who we are</div><h2>One ministry, <em>many homes.</em></h2></div>
+<div class="reveal"><p class="lead">Country Ministries International (CMI) is the ministry that carries Believers Country and its sister streams. Its centre is Christ Jesus; its witness is Scripture; its life is the Spirit glorifying the Son.</p>
+<p class="muted">You are on the Believers Country website, the communal expression of CMI: where believers gather, belong and grow together. School of Scriptures teaches and publishes, Commonwealth carries practical care, and Country Vanguard goes out in mission. Each has its own work; all of them are one ministry.</p></div></div></section>
+
+<section class="section tight" id="streams"><div class="container">
+<div class="section-head reveal"><div><div class="eyebrow">The four streams</div><h2>One river, <em>four streams.</em></h2><p class="lead">A river went out of Eden and parted into four heads (Genesis 2:10). Our ministries are distinct in function and one in source.</p></div><a class="textlink" href="{r}ministries/">All ministries <span class="arr">→</span></a></div>
+<div class="grid g4 reveal-stagger">{streams}</div></div></section>
+
+<section class="section tight" id="work"><div class="container">
+<div class="section-head reveal"><div><div class="eyebrow">What we do</div><h2>Ways to <em>take part.</em></h2></div></div>
+<div class="grid g4 reveal-stagger">{w}</div></div></section>
+
+<section class="section tight"><div class="container"><div class="summons reveal"><div class="kicker">The CMI core declaration</div>
+<p>Christ is the centre. Scripture is the witness. The Spirit glorifies the Son. The Son honours the Father. The Country belongs to the Father.</p></div></div></section>
+
+<section class="section tight" id="partner"><div class="container"><div class="callband reveal"><div><h2>Partner with <em>CMI.</em></h2>
+<p>Offerings, venue projects and country projects across every stream are received into accounts held in the name of Country Ministries International, and stewarded for the whole ministry.</p></div>
+<div class="cta"><a class="button gold" href="{r}contact/#give">{I['gift']} Give · Partner</a><a class="button ghost" href="{LINKS['shabbat']}" target="_blank" rel="noopener">{I['whatsapp']} Join this Shabbat</a></div></div></div></section>'''
 
 # ------------------------------------------------------------------ ABOUT
 def about(r):
@@ -935,6 +989,8 @@ def write_app_files():
 def main():
     page('', 'Believers Country', 'Believers Country — Country Ministries International. Weekly encounters, Shabbat teachings celebrating the Son, the 2 Minutes Podcast and the Spiritual Intent books.', home, 'home',
          None)
+    page('cmi/', 'Country Ministries International', 'Country Ministries International (CMI): the ministry behind Believers Country, with four streams — Believers Country, School of Scriptures, Commonwealth and Country Vanguard.', cmi_page, 'cmi',
+         {'@type': 'AboutPage', 'name': 'Country Ministries International', 'about': {'@id': SITE_URL + '#org'}})
     page('about/', 'About', 'Who we are: a people belonging to the Father, a life received in the Son, a country expressed through His Spirit.', about, 'about')
     page('ministries/', 'Ministries', 'The four streams of CMI: Believers Country, School of Scriptures, Commonwealth and Country Vanguard.', ministries, 'ministries')
     for i, s in enumerate(STREAMS): stream_page(s, i)
