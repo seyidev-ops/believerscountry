@@ -260,11 +260,10 @@ def page(path, title, desc, body, section='', jsonld=None, extra_head='', out_fi
     og_img = 'assets/og-app.png' if is_app else 'assets/og-image.png'
     og_alt = 'The 2 Minutes app · Believers Country' if is_app else 'Believers Country — Country Ministries International'
     touch = 'assets/apple-touch-icon-app.png' if is_app else 'assets/apple-touch-icon.png'
-    if is_app:
-        icons = (f'<link rel="icon" href="{r}assets/app-icon-192.png" type="image/png" sizes="192x192">'
-                 f'<link rel="icon" href="{r}assets/app-icon-512.png" type="image/png" sizes="512x512">')
-    else:
-        icons = TAB_ICONS.replace('{r}', r)
+    # Every page uses the 2 Minutes app icon (the ב with the flame) as its tab icon, so sharing from
+    # anywhere on the site shows the app icon. (Previous day/night CMI tab icons: TAB_ICONS.)
+    icons = (f'<link rel="icon" href="{r}assets/app-icon-192.png" type="image/png" sizes="192x192">'
+             f'<link rel="icon" href="{r}assets/app-icon-512.png" type="image/png" sizes="512x512">')
     eps = json.dumps([{k: ep[k] for k in ('slug', 'title', 'date', 'audio', 'path', 'seconds', 'label')} for ep in EPISODES])
     doc = f'''<!DOCTYPE html>
 <html lang="en" class="no-js" data-mode="system" data-theme="day" data-root="{r}">
