@@ -316,7 +316,7 @@ def page(path, title, desc, body, section='', jsonld=None, extra_head='', out_fi
     ld = f'<script type="application/ld+json">{json.dumps({"@context": "https://schema.org", "@graph": graph}, ensure_ascii=False)}</script>' if graph else ''
     og_type = OG_TYPE.get(path.split('/')[0], 'website') if path.count('/') > 1 else 'website'
     is_app = path.startswith('listen/') or path.startswith('app/')
-    og_img = 'assets/og-app.png' if is_app else 'assets/og-cmi.png' if path.startswith('cmi/') else 'assets/og-image.png'
+    og_img = 'assets/og-app-2.jpg' if is_app else 'assets/og-cmi.png' if path.startswith('cmi/') else 'assets/og-image.png'
     og_alt = 'The 2 Minutes app · Believers Country' if is_app else 'Believers Country — Country Ministries International'
     touch = 'assets/apple-touch-icon-app.png?v=3'
     # Tab icon: the ב with its flame on a transparent ground: ink in Day, white in Night (swapped live by the theme toggle).

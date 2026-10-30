@@ -793,3 +793,8 @@ ul.clean{list-style:none;padding:0;margin:0}
 .brand .mark.bc{height:32px;margin-right:-2px}
 .footer-brand .mark.bc{height:42px;margin-right:-2px}
 @media (max-width:620px){.brand .mark.bc{height:30px}}
+/* v4.2: name set exactly like the homepage title: Believers in gold italic, Country upright, both left-aligned */
+.brand-name{align-items:flex-start;text-align:left}
+.brand-name em{font-weight:500;background:linear-gradient(100deg,var(--gold) 10%,var(--gold2) 45%,var(--gold) 90%);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:sheen 7s linear infinite;padding-right:.08em}
+.brand-name span{font-weight:600;margin-top:0}
+@media (prefers-reduced-motion:reduce){.brand-name em{animation:none}}
