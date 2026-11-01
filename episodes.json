@@ -1,5 +1,27 @@
 [
  {
+  "slug": "we-speak-wisdom",
+  "title": "We Speak Wisdom",
+  "date": "2026-11-02",
+  "seconds": 107,
+  "label": "1:47",
+  "blurb": "A short word from Believers Country on the wisdom we speak. Press play, then carry it with you through the day.",
+  "path": "listen/2-minutes/we-speak-wisdom/",
+  "audio": "assets/audio/we-speak-wisdom.mp3",
+  "url": "https://believerscountry.org/listen/2-minutes/we-speak-wisdom/"
+ },
+ {
+  "slug": "for-your-glory",
+  "title": "For Your Glory",
+  "date": "2026-11-01",
+  "seconds": 88,
+  "label": "1:28",
+  "blurb": "A short word from Believers Country: for Your glory. Press play, then carry it with you through the day.",
+  "path": "listen/2-minutes/for-your-glory/",
+  "audio": "assets/audio/for-your-glory.mp3",
+  "url": "https://believerscountry.org/listen/2-minutes/for-your-glory/"
+ },
+ {
   "slug": "the-life-of-god-part-4",
   "title": "The Life of God (Part 4)",
   "date": "2026-10-31",

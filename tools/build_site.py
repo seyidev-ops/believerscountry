@@ -57,6 +57,10 @@ for s in SERVICES:
     s['iso'] = dt.datetime.strptime(s['date'], '%d %B %Y').date().isoformat()
 
 EPISODES = [
+    dict(slug='we-speak-wisdom', title='We Speak Wisdom', date='2026-11-02', seconds=107, label='1:47',
+         word='We speak wisdom', blurb='A short word from Believers Country on the wisdom we speak. Press play, then carry it with you through the day.'),
+    dict(slug='for-your-glory', title='For Your Glory', date='2026-11-01', seconds=88, label='1:28',
+         word='For Your glory', blurb='A short word from Believers Country: for Your glory. Press play, then carry it with you through the day.'),
     dict(slug='the-life-of-god-part-4', title='The Life of God (Part 4)', date='2026-10-31', seconds=86, label='1:26',
          word='The life of God', blurb='The fourth word in the series on the life of God: the life of the Son, received and lived by the one who believes.'),
     dict(slug='the-life-of-god-part-3', title='The Life of God (Part 3)', date='2026-10-30', seconds=99, label='1:39',
@@ -425,7 +429,7 @@ def player(r, ep, today=False, feature=False, tools=True):
             f'<div class="player-time"><span class="t-cur">0:00</span><span class="t-total">{ep["label"]}</span></div>{t}</div></div>')
 
 def ep_card(r, ep):
-    ax = {'the-life-of-god-part-4': '30%', 'the-life-of-god-part-3': '70%', 'the-life-of-god-part-2': '45%', 'the-life-of-god-part-1': '15%', 'grace-is-not-works': '80%', 'what-is-grace': '50%', 'son-talk-part-2': '30%', 'son-talk-part-1': '65%', 'who-are-believers': '40%', 'believe-on-him-part-3': '75%', 'how-believe-comes': '20%', 'believing-on-him-part-2': '55%', 'believe-on-him-part-1': '35%', 'the-measuring-line': '60%', 'no-separation': '25%', 'proof-that-you-know-god': '70%', 'what-is-your-advantage-as-a-believer': '45%', 'relationship-with-the-father': '80%'}[ep['slug']]
+    ax = {'we-speak-wisdom': '55%', 'for-your-glory': '20%', 'the-life-of-god-part-4': '30%', 'the-life-of-god-part-3': '70%', 'the-life-of-god-part-2': '45%', 'the-life-of-god-part-1': '15%', 'grace-is-not-works': '80%', 'what-is-grace': '50%', 'son-talk-part-2': '30%', 'son-talk-part-1': '65%', 'who-are-believers': '40%', 'believe-on-him-part-3': '75%', 'how-believe-comes': '20%', 'believing-on-him-part-2': '55%', 'believe-on-him-part-1': '35%', 'the-measuring-line': '60%', 'no-separation': '25%', 'proof-that-you-know-god': '70%', 'what-is-your-advantage-as-a-believer': '45%', 'relationship-with-the-father': '80%'}[ep['slug']]
     return f'''<article class="card ep" style="--ax:{ax}"><div class="art" aria-hidden="true"><span class="rings"></span><span class="art-dur">{ep['label']}</span><span class="art-word">{e(ep['word'])}</span></div>
 <div class="kicker">{ep['pretty']} <span class="badge latest" data-today-flag="{ep['slug']}" hidden>Today</span></div>
 <h3><a class="card-link" href="{r}{ep['path']}">{e(ep['title'])}</a></h3><p>{e(ep['blurb'])}</p>{player(r, ep)}</article>'''
