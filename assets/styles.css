@@ -811,18 +811,9 @@ ul.clean{list-style:none;padding:0;margin:0}
 /* v4.5: "Send the audio" leads the share menu on 2 Minutes words */
 .share-menu .share-audio{grid-column:1 / -1;text-align:center;border:0;color:#160f03;background:linear-gradient(100deg,var(--gold2),var(--gold));padding:10px}
 .share-menu .share-audio:hover{color:#160f03;filter:brightness(1.05)}
-/* v4.6: on phones the refresh (cookie) button lives in the header, so it never covers page content */
-.refresh-head{display:none}
-@media (max-width:720px){
-  .refresh-fab{display:none}
-  .refresh-head{display:grid;place-items:center;width:38px;height:38px;flex-shrink:0;border-radius:50%;border:1px solid var(--line);background:transparent;color:var(--muted);cursor:pointer;padding:0}
-  .refresh-head svg{width:18px;height:18px}
-  .refresh-head.spinning svg{animation:rotate .7s linear infinite}
-}
 /* v4.6b: phone header fits at every width */
 @media (max-width:420px){
   .site-header .header-actions{gap:6px}
-  .refresh-head{width:34px;height:34px}.refresh-head svg{width:16px;height:16px}
   .menu-button{width:40px;height:40px}
   .site-header .bar{gap:6px;padding-left:16px}
   .cmi-header .brand-words strong{font-size:9.5px;letter-spacing:.03em}
@@ -845,14 +836,6 @@ ul.clean{list-style:none;padding:0;margin:0}
 }
 /* decorative rings and rays never push the page sideways */
 .page-hero.with-aside,.hero{overflow-x:clip}
-/* the floating refresh button only where there is a free margin beside the page; otherwise it sits in the header */
-@media (max-width:1319px){
-  .refresh-fab{display:none}
-  .refresh-head{display:grid;place-items:center;width:38px;height:38px;flex-shrink:0;border-radius:50%;border:1px solid var(--line);background:transparent;color:var(--muted);cursor:pointer;padding:0}
-  .refresh-head svg{width:18px;height:18px}
-  .refresh-head.spinning svg{animation:rotate .7s linear infinite}
-}
-@media (max-width:420px){.refresh-head{width:34px;height:34px}.refresh-head svg{width:16px;height:16px}}
 /* menu items never break onto two lines; in the narrower desktop range the toggle drops its word and the CMI menu tightens */
 .nav-item{white-space:nowrap}
 @media (min-width:921px) and (max-width:1199px){
@@ -865,3 +848,7 @@ ul.clean{list-style:none;padding:0;margin:0}
   .cmi-header .menu-button{display:flex}
   .cmi-header .header-actions{margin-left:auto}
 }
+
+/* v4.7: the refresh (cookie) button stays in its corner, now solid and ringed so it is easy to see */
+.refresh-fab{opacity:1;background:var(--surface-solid);border:1.5px solid color-mix(in srgb,var(--gold2) 70%,transparent);color:var(--gold);box-shadow:0 0 0 4px color-mix(in srgb,var(--gold2) 14%,transparent),0 10px 26px -10px rgba(0,0,0,.45);-webkit-backdrop-filter:none;backdrop-filter:none}
+.refresh-fab:hover,.refresh-fab:focus-visible{border-color:var(--gold2);box-shadow:0 0 0 6px color-mix(in srgb,var(--gold2) 22%,transparent),0 12px 28px -10px rgba(0,0,0,.5)}

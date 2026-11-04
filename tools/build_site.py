@@ -236,7 +236,7 @@ def header(r, section):
 <header class="site-header"><div class="container"><div class="bar">
 <a class="brand" href="{r or './'}" aria-label="Believers Country — home">{mark(still=True)}<span class="brand-name"><em>Believers</em><span>Country</span></span></a>
 <nav class="primary-nav" aria-label="Main">{''.join(top)}</nav>
-<div class="header-actions"><button class="refresh-head" type="button" data-refresh aria-label="Refresh the page and load the latest version" title="Refresh">{I['cookie']}</button>{toggle()}<a class="button gold join" href="{r}encounters/">Join us {I['arrow']}</a>
+<div class="header-actions">{toggle()}<a class="button gold join" href="{r}encounters/">Join us {I['arrow']}</a>
 <button class="menu-button" id="menu-button" type="button" aria-expanded="false" aria-controls="drawer" aria-label="Open menu"><i></i><i></i></button></div>
 </div></div></header>
 <div class="drawer" id="drawer" hidden><nav aria-label="Menu">{''.join(drawer)}</nav><div class="drawer-share">{share_app(r, 'button gold', 'Share the 2 Minutes app')}</div></div>'''
@@ -249,7 +249,7 @@ def cmi_header(r):
 <header class="site-header cmi-header"><div class="container"><div class="bar">
 <a class="brand" href="#top" aria-label="Country Ministries International">{cmi_mark(still=True)}<span class="brand-words"><strong><span>Country Ministries</span><span>International</span></strong><small>CMI</small></span></a>
 <nav class="primary-nav" aria-label="On this page">{top}{home}</nav>
-<div class="header-actions"><button class="refresh-head" type="button" data-refresh aria-label="Refresh the page and load the latest version" title="Refresh">{I['cookie']}</button>{toggle()}<a class="button gold join" href="#partner">Partner {I['arrow']}</a>
+<div class="header-actions">{toggle()}<a class="button gold join" href="#partner">Partner {I['arrow']}</a>
 <button class="menu-button" id="menu-button" type="button" aria-expanded="false" aria-controls="drawer" aria-label="Open menu"><i></i><i></i></button></div>
 </div></div></header>
 <div class="drawer" id="drawer" hidden><nav aria-label="On this page">{drawer}<a class="d-link" href="{r or './'}">Believers Country <small>Home</small></a></nav></div>'''
@@ -327,7 +327,7 @@ def page(path, title, desc, body, section='', jsonld=None, extra_head='', out_fi
     og_type = OG_TYPE.get(path.split('/')[0], 'website') if path.count('/') > 1 else 'website'
     is_app = path.startswith('listen/') or path.startswith('app/')
     ep_slug = path.split('/')[2] if path.startswith('listen/2-minutes/') and path.count('/') == 3 else ''
-    ep_card = f'assets/og/ep-{ep_slug}.jpg' if ep_slug and (ROOT / f'assets/og/ep-{ep_slug}.jpg').exists() else ''
+    ep_card = f'assets/og/ep-{ep_slug}-v{CARD_V}.jpg' if ep_slug and (ROOT / f'assets/og/ep-{ep_slug}-v{CARD_V}.jpg').exists() else ''
     og_img = ep_card or 'assets/og-app-2.jpg' if is_app else 'assets/og-cmi.png' if path.startswith('cmi/') else 'assets/og-image.png'
     og_alt = (f'{title} · 2 Minutes · Believers Country' if ep_card else 'The 2 Minutes app · Believers Country') if is_app else 'Believers Country — Country Ministries International'
     touch = 'assets/apple-touch-icon-app.png?v=3'
@@ -1068,10 +1068,12 @@ def write_app_files():
     ver = hashlib.sha1(((ROOT / 'assets/styles.css').read_bytes() + (ROOT / 'assets/app.js').read_bytes() + feed.encode())).hexdigest()[:10]
     (ROOT / 'sw.js').write_text((ROOT / 'tools/sw.template.js').read_text().replace('__VERSION__', ver))
 
+CARD_V = 2
+
 def episode_cards():
     """A share card (1200x630) for each 2 Minutes word, so a shared episode shows that word, not the app."""
     out = ROOT / 'assets/og'; out.mkdir(exist_ok=True)
-    todo = [ep for ep in EPISODES if not (out / f"ep-{ep['slug']}.jpg").exists()]
+    todo = [ep for ep in EPISODES if not (out / f"ep-{ep['slug']}-v{CARD_V}.jpg").exists()]
     if not todo:
         return
     try:
@@ -1107,7 +1109,7 @@ h1{{font:700 {size}px/1.02 CG;margin:26px 0 18px;color:#fbf6ea}}
 <div class="pill"><b></b>Listen · {ep['label']}</div></body></html>'''
             pg.set_content(html); pg.wait_for_timeout(150)
             tmp = out / f"ep-{ep['slug']}.png"; pg.screenshot(path=str(tmp))
-            Image.open(tmp).convert('RGB').save(out / f"ep-{ep['slug']}.jpg", quality=86, optimize=True, progressive=True); tmp.unlink()
+            Image.open(tmp).convert('RGB').save(out / f"ep-{ep['slug']}-v{CARD_V}.jpg", quality=86, optimize=True, progressive=True); tmp.unlink()
         b.close()
     print(f'Made {len(todo)} episode share card(s)')
 
