@@ -206,7 +206,7 @@
     $('.player-title', p).textContent = todayEp.title;
     const link = $('[data-today-link]', p.closest('[data-today-wrap]') || document);
     if (link) link.href = ROOT + todayEp.path.replace(/^\//, '');
-    const share = $('.share', p); if (share) { share.dataset.shareTitle = todayEp.title; share.dataset.shareUrl = ROOT + todayEp.path.replace(/^\//, ''); share.dataset.shareText = 'Listen: ' + todayEp.title + ' · 2 Minutes · Believers Country'; if (share.dataset.shareAudio !== undefined) share.dataset.shareAudio = ROOT + todayEp.audio.replace(/^\//, ''); }
+    const share = $('.share', p); if (share) { share.dataset.shareTitle = todayEp.title; share.dataset.shareUrl = ROOT + todayEp.path.replace(/^\//, ''); share.dataset.shareText = 'Listen: ' + todayEp.title + ' · 2 Minutes · Believers Country'; }
     const dl = $('[data-download]', p); if (dl) { dl.href = p.dataset.src; dl.setAttribute('download', todayEp.slug + '.mp3'); }
     const tt = $('.player-time .t-total', p); if (tt) tt.textContent = todayEp.label;
   });
@@ -362,43 +362,12 @@
   }
 
   /* ---------------- sharing ---------------- */
-  /* send the episode's audio itself (phones share the MP3 file; elsewhere it downloads) */
-  const audioCache = new Map();
-  const getAudio = src => { if (!audioCache.has(src)) audioCache.set(src, fetch(src).then(r => { if (!r.ok) throw new Error('audio'); return r.blob(); }).catch(err => { audioCache.delete(src); throw err; })); return audioCache.get(src); };
-  const canSendFiles = (() => { try { return !!(navigator.canShare && navigator.canShare({ files: [new File([''], 'a.mp3', { type: 'audio/mpeg' })] })); } catch (_) { return false; } })();
-  async function sendAudio(box, pageUrl, msg) {
-    const src = new URL(box.dataset.shareAudio, location.href).href, name = (box.dataset.shareTitle || 'episode') + '.mp3';
-    const text = (box.dataset.shareText || box.dataset.shareTitle || '') + ' — ' + pageUrl;
-    if (msg) msg.textContent = 'Preparing the audio…';
-    let blob;
-    try { blob = await getAudio(src); } catch (_) { if (msg) msg.textContent = 'Could not load the audio. Check your connection and try again.'; return 'error'; }
-    const file = new File([blob], name, { type: 'audio/mpeg' });
-    if (canSendFiles && navigator.canShare({ files: [file] })) {
-      try { await navigator.share({ files: [file], title: box.dataset.shareTitle, text }); if (msg) msg.textContent = ''; return 'sent'; }
-      catch (err) {
-        if (err && err.name === 'AbortError') { if (msg) msg.textContent = ''; return 'cancelled'; }
-        if (msg) msg.textContent = 'The audio is ready. Tap “Send the audio” to share it.'; return 'retry';
-      }
-    }
-    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove();
-    if (msg) msg.textContent = 'This browser cannot send files, so the audio has been downloaded for you to send.';
-    return 'downloaded';
-  }
-
   const shares = $$('.share');
   const closeShares = except => shares.forEach(s => { if (s !== except) { const m = $('.share-menu', s); if (m) m.hidden = true; $('[data-share-toggle]', s)?.setAttribute('aria-expanded', 'false'); } });
   shares.forEach(box => {
     const tg = $('[data-share-toggle]', box), menu = $('.share-menu', box), msg = $('.share-msg', box);
-    if (box.dataset.shareAudio && canSendFiles) tg && tg.addEventListener('pointerdown', () => { getAudio(new URL(box.dataset.shareAudio, location.href).href).catch(() => {}); }, { passive: true });
     tg && tg.addEventListener('click', async e => {
       e.stopPropagation();
-      // a 2 Minutes word: on phones the Share audio button sends the MP3 straight away
-      if (box.dataset.shareAudio && canSendFiles) {
-        const url = new URL(box.dataset.shareUrl || location.href, location.href).href;
-        const res = await sendAudio(box, url, msg);
-        if (res === 'sent' || res === 'cancelled') return;
-        closeShares(box); menu.hidden = false; tg.setAttribute('aria-expanded', 'true'); return;
-      }
       if (box.hasAttribute('data-share-direct') && navigator.share) {
         const url = new URL(box.dataset.shareUrl || location.href, location.href).href;
         try { await navigator.share({ title: box.dataset.shareTitle || document.title, text: box.dataset.shareText || '', url }); return; } catch (err) { if (err && err.name === 'AbortError') return; }
@@ -409,7 +378,6 @@
       const url = new URL(box.dataset.shareUrl || location.href, location.href).href;
       const title = (box.dataset.shareTitle || document.title) + ' · Believers Country';
       const u = encodeURIComponent(url), t = encodeURIComponent(box.dataset.shareText || title), p = b.dataset.share;
-      if (p === 'audio') { await sendAudio(box, url, msg); return; }
       if (p === 'native') { if (navigator.share) { try { await navigator.share({ title, text: box.dataset.shareText || '', url }); } catch (_) {} } else msg.textContent = 'Choose a platform below.'; return; }
       if (p === 'copy') { try { await navigator.clipboard.writeText(url); msg.textContent = 'Link copied.'; } catch (_) { msg.textContent = url; } return; }
       const links = { whatsapp: 'https://api.whatsapp.com/send?text=' + t + '%20' + u, x: 'https://twitter.com/intent/tweet?text=' + t + '&url=' + u, facebook: 'https://www.facebook.com/sharer/sharer.php?u=' + u, telegram: 'https://t.me/share/url?url=' + u + '&text=' + t, email: 'mailto:?subject=' + t + '&body=' + u };

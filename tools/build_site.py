@@ -414,11 +414,10 @@ def portrait(r):
             f'</div><span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span></div></div>'
             f'<figcaption><b>Seyi &amp; Shirley Ashiru</b></figcaption></figure>')
 
-def share_box(title, url, label='Share', cls='chip', text='', direct=False, audio=''):
-    extra = (f' data-share-text="{e(text)}"' if text else '') + (' data-share-direct' if direct else '') + (f' data-share-audio="{audio}"' if audio else '')
-    send = ('<button type="button" class="share-audio" data-share="audio">Send the audio</button>' if audio else '')
+def share_box(title, url, label='Share', cls='chip', text='', direct=False):
+    extra = (f' data-share-text="{e(text)}"' if text else '') + (' data-share-direct' if direct else '')
     return (f'<div class="share" data-share-title="{e(title)}" data-share-url="{url}"{extra}><button class="{cls}" type="button" data-share-toggle aria-expanded="false">{I["share"]} {label}</button>'
-            f'<div class="share-menu" hidden>{send}<button type="button" data-share="whatsapp">WhatsApp</button><button type="button" data-share="native">Device share</button>'
+            '<div class="share-menu" hidden><button type="button" data-share="whatsapp">WhatsApp</button><button type="button" data-share="native">Device share</button>'
             '<button type="button" data-share="x">X / Twitter</button><button type="button" data-share="facebook">Facebook</button><button type="button" data-share="telegram">Telegram</button>'
             '<button type="button" data-share="email">Email</button><button type="button" data-share="copy">Copy link</button><p class="share-msg" role="status"></p></div></div>')
 
@@ -429,7 +428,7 @@ def player(r, ep, today=False, feature=False, tools=True):
         skip = ('<button class="chip" type="button" data-skip="-15" aria-label="Back 15 seconds">↺ 15s</button><button class="chip" type="button" data-skip="30" aria-label="Forward 30 seconds">30s ↻</button>'
                 if ep['seconds'] > 600 else '')
         t = (f'<div class="player-tools">{skip}<a class="chip" data-download href="{r}{ep["audio"]}" download="{ep["slug"]}.mp3">{I["download"]} MP3</a>'
-             f'{share_box(ep["title"], r + ep["path"], text="Listen: " + ep["title"] + (" · 2 Minutes · Believers Country" if ep["seconds"] <= 600 else " · Shabbat service · Believers Country"), audio=(r + ep["audio"]) if ep["seconds"] <= 600 else "", label="Share audio" if ep["seconds"] <= 600 else "Share")}</div>')
+             f'{share_box(ep["title"], r + ep["path"], label="Share audio", text="Listen: " + ep["title"] + (" · 2 Minutes · Believers Country" if ep["seconds"] <= 600 else " · Shabbat service · Believers Country"), direct=True)}</div>')
     return (f'<div class="player{" feature" if feature else ""}" {attrs}data-src="{r}{ep["audio"]}" data-duration="{ep["seconds"]}" data-album="{'Shabbat Services 5787' if ep['seconds'] > 600 else '2 Minutes Podcast'}">'
             f'<button class="play" type="button" aria-label="Play {e(ep["title"])}">{I["play"]}{I["pause"]}</button>'
             f'<div class="player-body"><div class="player-title">{e(ep["title"])}</div><div class="bars" aria-hidden="true"></div>'
