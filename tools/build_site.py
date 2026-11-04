@@ -326,8 +326,10 @@ def page(path, title, desc, body, section='', jsonld=None, extra_head='', out_fi
     ld = f'<script type="application/ld+json">{json.dumps({"@context": "https://schema.org", "@graph": graph}, ensure_ascii=False)}</script>' if graph else ''
     og_type = OG_TYPE.get(path.split('/')[0], 'website') if path.count('/') > 1 else 'website'
     is_app = path.startswith('listen/') or path.startswith('app/')
-    og_img = 'assets/og-app-2.jpg' if is_app else 'assets/og-cmi.png' if path.startswith('cmi/') else 'assets/og-image.png'
-    og_alt = 'The 2 Minutes app · Believers Country' if is_app else 'Believers Country — Country Ministries International'
+    ep_slug = path.split('/')[2] if path.startswith('listen/2-minutes/') and path.count('/') == 3 else ''
+    ep_card = f'assets/og/ep-{ep_slug}.jpg' if ep_slug and (ROOT / f'assets/og/ep-{ep_slug}.jpg').exists() else ''
+    og_img = ep_card or 'assets/og-app-2.jpg' if is_app else 'assets/og-cmi.png' if path.startswith('cmi/') else 'assets/og-image.png'
+    og_alt = (f'{title} · 2 Minutes · Believers Country' if ep_card else 'The 2 Minutes app · Believers Country') if is_app else 'Believers Country — Country Ministries International'
     touch = 'assets/apple-touch-icon-app.png?v=3'
     # Tab icon: the ב with its flame on a transparent ground: ink in Day, white in Night (swapped live by the theme toggle).
     icons = TAB_ICONS.replace('{r}', r)
@@ -412,10 +414,11 @@ def portrait(r):
             f'</div><span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span></div></div>'
             f'<figcaption><b>Seyi &amp; Shirley Ashiru</b></figcaption></figure>')
 
-def share_box(title, url, label='Share', cls='chip', text='', direct=False):
-    extra = (f' data-share-text="{e(text)}"' if text else '') + (' data-share-direct' if direct else '')
+def share_box(title, url, label='Share', cls='chip', text='', direct=False, audio=''):
+    extra = (f' data-share-text="{e(text)}"' if text else '') + (' data-share-direct' if direct else '') + (f' data-share-audio="{audio}"' if audio else '')
+    send = ('<button type="button" class="share-audio" data-share="audio">Send the audio</button>' if audio else '')
     return (f'<div class="share" data-share-title="{e(title)}" data-share-url="{url}"{extra}><button class="{cls}" type="button" data-share-toggle aria-expanded="false">{I["share"]} {label}</button>'
-            '<div class="share-menu" hidden><button type="button" data-share="whatsapp">WhatsApp</button><button type="button" data-share="native">Device share</button>'
+            f'<div class="share-menu" hidden>{send}<button type="button" data-share="whatsapp">WhatsApp</button><button type="button" data-share="native">Device share</button>'
             '<button type="button" data-share="x">X / Twitter</button><button type="button" data-share="facebook">Facebook</button><button type="button" data-share="telegram">Telegram</button>'
             '<button type="button" data-share="email">Email</button><button type="button" data-share="copy">Copy link</button><p class="share-msg" role="status"></p></div></div>')
 
@@ -426,7 +429,7 @@ def player(r, ep, today=False, feature=False, tools=True):
         skip = ('<button class="chip" type="button" data-skip="-15" aria-label="Back 15 seconds">↺ 15s</button><button class="chip" type="button" data-skip="30" aria-label="Forward 30 seconds">30s ↻</button>'
                 if ep['seconds'] > 600 else '')
         t = (f'<div class="player-tools">{skip}<a class="chip" data-download href="{r}{ep["audio"]}" download="{ep["slug"]}.mp3">{I["download"]} MP3</a>'
-             f'{share_box(ep["title"], r + ep["path"])}</div>')
+             f'{share_box(ep["title"], r + ep["path"], text="Listen: " + ep["title"] + (" · 2 Minutes · Believers Country" if ep["seconds"] <= 600 else " · Shabbat service · Believers Country"), audio=(r + ep["audio"]) if ep["seconds"] <= 600 else "")}</div>')
     return (f'<div class="player{" feature" if feature else ""}" {attrs}data-src="{r}{ep["audio"]}" data-duration="{ep["seconds"]}" data-album="{'Shabbat Services 5787' if ep['seconds'] > 600 else '2 Minutes Podcast'}">'
             f'<button class="play" type="button" aria-label="Play {e(ep["title"])}">{I["play"]}{I["pause"]}</button>'
             f'<div class="player-body"><div class="player-title">{e(ep["title"])}</div><div class="bars" aria-hidden="true"></div>'
@@ -1065,7 +1068,51 @@ def write_app_files():
     ver = hashlib.sha1(((ROOT / 'assets/styles.css').read_bytes() + (ROOT / 'assets/app.js').read_bytes() + feed.encode())).hexdigest()[:10]
     (ROOT / 'sw.js').write_text((ROOT / 'tools/sw.template.js').read_text().replace('__VERSION__', ver))
 
+def episode_cards():
+    """A share card (1200x630) for each 2 Minutes word, so a shared episode shows that word, not the app."""
+    out = ROOT / 'assets/og'; out.mkdir(exist_ok=True)
+    todo = [ep for ep in EPISODES if not (out / f"ep-{ep['slug']}.jpg").exists()]
+    if not todo:
+        return
+    try:
+        from playwright.sync_api import sync_playwright
+        from PIL import Image
+    except Exception as err:
+        print('episode cards skipped:', err); return
+    import base64
+    fonts = ''.join(f"@font-face{{font-family:'{fam}';font-style:{st};font-weight:{w};src:url(data:font/woff2;base64,"
+                    f"{base64.b64encode((ROOT / 'tools/fonts' / fn).read_bytes()).decode()}) format('woff2')}}"
+                    for fam, st, w, fn in [('CG', 'normal', 600, 'cormorant-garamond-latin-600-normal.woff2'), ('CG', 'italic', 600, 'cormorant-garamond-latin-600-italic.woff2'),
+                                           ('CG', 'normal', 700, 'cormorant-garamond-latin-700-normal.woff2'), ('MR', 'normal', 600, 'manrope-latin-600-normal.woff2'), ('MR', 'normal', 700, 'manrope-latin-700-normal.woff2')])
+    mark_svg = favicon_svg('#f6efe0')
+    bars = ''.join(f'<i style="height:{h}px"></i>' for h in [14, 26, 40, 24, 50, 32, 60, 44, 28, 54, 36, 20, 46, 30, 58, 34, 18, 42, 24, 52, 30, 16, 36, 22])
+    with sync_playwright() as p:
+        b = p.chromium.launch(); pg = b.new_page(viewport={'width': 1200, 'height': 630})
+        for ep in todo:
+            t = e(ep['title']); size = 92 if len(ep['title']) < 22 else 78 if len(ep['title']) < 30 else 64
+            html = f'''<html><head><style>{fonts}
+*{{margin:0;box-sizing:border-box}}body{{width:1200px;height:630px;overflow:hidden;background:radial-gradient(120% 90% at 85% 20%,#1c2f57 0%,#0c1630 55%,#070d1e 100%);color:#f6efe0;font-family:MR,sans-serif;position:relative}}
+.glow{{position:absolute;right:120px;top:90px;width:420px;height:420px;border-radius:50%;background:radial-gradient(closest-side,rgba(242,183,60,.30),transparent)}}
+.mark{{position:absolute;right:190px;top:110px;height:400px}}.mark svg{{height:100%;width:auto}}
+.wrap{{position:absolute;left:84px;top:86px;width:660px}}
+.k{{font:700 20px MR;letter-spacing:.28em;color:#e6b85c;text-transform:uppercase}}
+h1{{font:700 {size}px/1.02 CG;margin:26px 0 18px;color:#fbf6ea}}
+.d{{font:600 italic 30px CG;color:#e6b85c}}
+.wave{{display:flex;align-items:center;gap:7px;height:64px;margin:22px 0 0}}.wave i{{display:block;width:7px;border-radius:4px;background:linear-gradient(#f2d48a,#c99a3b)}}
+.pill{{position:absolute;left:84px;bottom:58px;display:flex;align-items:center;gap:16px;font:700 24px MR;color:#160f03;background:linear-gradient(100deg,#f2d48a,#c99a3b);padding:16px 30px 16px 18px;border-radius:999px}}
+.pill b{{width:44px;height:44px;border-radius:50%;background:#160f03;display:grid;place-items:center}}.pill b:after{{content:'';border-left:15px solid #f2d48a;border-top:10px solid transparent;border-bottom:10px solid transparent;margin-left:4px}}
+.site{{position:absolute;right:84px;bottom:84px;font:700 20px MR;letter-spacing:.12em;color:rgba(246,239,224,.7)}}
+</style></head><body><div class="glow"></div><div class="mark">{mark_svg}</div>
+<div class="wrap"><div class="k">2 Minutes · Believers Country</div><h1>{t}</h1><div class="d">{ep['pretty'].replace(' · ', ', ')}</div><div class="wave">{bars}</div></div>
+<div class="pill"><b></b>Listen · {ep['label']}</div><div class="site">BELIEVERSCOUNTRY.ORG</div></body></html>'''
+            pg.set_content(html); pg.wait_for_timeout(150)
+            tmp = out / f"ep-{ep['slug']}.png"; pg.screenshot(path=str(tmp))
+            Image.open(tmp).convert('RGB').save(out / f"ep-{ep['slug']}.jpg", quality=86, optimize=True, progressive=True); tmp.unlink()
+        b.close()
+    print(f'Made {len(todo)} episode share card(s)')
+
 def main():
+    episode_cards()
     page('', 'Believers Country', 'Believers Country — Country Ministries International. Weekly encounters, Shabbat teachings celebrating the Son, the 2 Minutes Podcast and the Spiritual Intent books.', home, 'home',
          None)
     page('cmi/', 'Country Ministries International', 'Country Ministries International (CMI): the ministry behind Believers Country, with four streams — Believers Country, School of Scriptures, Commonwealth and Country Vanguard.', cmi_page, 'cmi',

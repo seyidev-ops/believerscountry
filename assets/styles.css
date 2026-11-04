@@ -808,3 +808,6 @@ ul.clean{list-style:none;padding:0;margin:0}
   .arc-bar>div>span{grid-column:2;grid-row:1 / span 2}
   .arc-bar .now-pill{position:static;grid-column:1;grid-row:2;justify-self:start;align-self:start}
 }
+/* v4.5: "Send the audio" leads the share menu on 2 Minutes words */
+.share-menu .share-audio{grid-column:1 / -1;text-align:center;border:0;color:#160f03;background:linear-gradient(100deg,var(--gold2),var(--gold));padding:10px}
+.share-menu .share-audio:hover{color:#160f03;filter:brightness(1.05)}
