@@ -363,29 +363,42 @@
 
   /* ---------------- sharing ---------------- */
   /* send the episode's audio itself (phones share the MP3 file; elsewhere it downloads) */
+  const audioCache = new Map();
+  const getAudio = src => { if (!audioCache.has(src)) audioCache.set(src, fetch(src).then(r => { if (!r.ok) throw new Error('audio'); return r.blob(); }).catch(err => { audioCache.delete(src); throw err; })); return audioCache.get(src); };
+  const canSendFiles = (() => { try { return !!(navigator.canShare && navigator.canShare({ files: [new File([''], 'a.mp3', { type: 'audio/mpeg' })] })); } catch (_) { return false; } })();
   async function sendAudio(box, pageUrl, msg) {
     const src = new URL(box.dataset.shareAudio, location.href).href, name = (box.dataset.shareTitle || 'episode') + '.mp3';
     const text = (box.dataset.shareText || box.dataset.shareTitle || '') + ' — ' + pageUrl;
-    msg.textContent = 'Preparing the audio…';
-    try {
-      const blob = await (await fetch(src)).blob();
-      const file = new File([blob], name, { type: 'audio/mpeg' });
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        msg.textContent = '';
-        try { await navigator.share({ files: [file], title: box.dataset.shareTitle, text }); } catch (err) { if (err && err.name !== 'AbortError') msg.textContent = 'Could not send the audio.'; }
-        return;
+    if (msg) msg.textContent = 'Preparing the audio…';
+    let blob;
+    try { blob = await getAudio(src); } catch (_) { if (msg) msg.textContent = 'Could not load the audio. Check your connection and try again.'; return 'error'; }
+    const file = new File([blob], name, { type: 'audio/mpeg' });
+    if (canSendFiles && navigator.canShare({ files: [file] })) {
+      try { await navigator.share({ files: [file], title: box.dataset.shareTitle, text }); if (msg) msg.textContent = ''; return 'sent'; }
+      catch (err) {
+        if (err && err.name === 'AbortError') { if (msg) msg.textContent = ''; return 'cancelled'; }
+        if (msg) msg.textContent = 'The audio is ready. Tap “Send the audio” to share it.'; return 'retry';
       }
-      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove();
-      msg.textContent = 'This browser cannot send files, so the audio has been downloaded for you to send.';
-    } catch (_) { msg.textContent = 'Could not load the audio. Check your connection and try again.'; }
+    }
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove();
+    if (msg) msg.textContent = 'This browser cannot send files, so the audio has been downloaded for you to send.';
+    return 'downloaded';
   }
 
   const shares = $$('.share');
   const closeShares = except => shares.forEach(s => { if (s !== except) { const m = $('.share-menu', s); if (m) m.hidden = true; $('[data-share-toggle]', s)?.setAttribute('aria-expanded', 'false'); } });
   shares.forEach(box => {
     const tg = $('[data-share-toggle]', box), menu = $('.share-menu', box), msg = $('.share-msg', box);
+    if (box.dataset.shareAudio && canSendFiles) tg && tg.addEventListener('pointerdown', () => { getAudio(new URL(box.dataset.shareAudio, location.href).href).catch(() => {}); }, { passive: true });
     tg && tg.addEventListener('click', async e => {
       e.stopPropagation();
+      // a 2 Minutes word: on phones the Share audio button sends the MP3 straight away
+      if (box.dataset.shareAudio && canSendFiles) {
+        const url = new URL(box.dataset.shareUrl || location.href, location.href).href;
+        const res = await sendAudio(box, url, msg);
+        if (res === 'sent' || res === 'cancelled') return;
+        closeShares(box); menu.hidden = false; tg.setAttribute('aria-expanded', 'true'); return;
+      }
       if (box.hasAttribute('data-share-direct') && navigator.share) {
         const url = new URL(box.dataset.shareUrl || location.href, location.href).href;
         try { await navigator.share({ title: box.dataset.shareTitle || document.title, text: box.dataset.shareText || '', url }); return; } catch (err) { if (err && err.name === 'AbortError') return; }
@@ -513,14 +526,13 @@
   });
 
   /* ---------------- refresh: clear the app's stored copies and load the latest ---------------- */
-  const refreshBtn = $('[data-refresh]');
-  if (refreshBtn) refreshBtn.addEventListener('click', async () => {
+  $$('[data-refresh]').forEach(refreshBtn => refreshBtn.addEventListener('click', async () => {
     refreshBtn.classList.add('spinning');
     try { if ('caches' in window) { const keys = await caches.keys(); await Promise.all(keys.filter(k => k.startsWith('bc-') && k !== 'bc-meta').map(k => caches.delete(k))); } } catch (_) {}
     try { const reg = await navigator.serviceWorker?.getRegistration(); if (reg) await reg.update(); } catch (_) {}
     const u = new URL(location.href); u.searchParams.set('r', Date.now().toString(36));
     setTimeout(() => location.replace(u.href), 350);
-  });
+  }));
 
   /* ---------------- footer year ---------------- */
   $$('[data-year]').forEach(el => el.textContent = new Date().getFullYear());

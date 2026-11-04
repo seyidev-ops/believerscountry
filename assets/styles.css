@@ -811,3 +811,57 @@ ul.clean{list-style:none;padding:0;margin:0}
 /* v4.5: "Send the audio" leads the share menu on 2 Minutes words */
 .share-menu .share-audio{grid-column:1 / -1;text-align:center;border:0;color:#160f03;background:linear-gradient(100deg,var(--gold2),var(--gold));padding:10px}
 .share-menu .share-audio:hover{color:#160f03;filter:brightness(1.05)}
+/* v4.6: on phones the refresh (cookie) button lives in the header, so it never covers page content */
+.refresh-head{display:none}
+@media (max-width:720px){
+  .refresh-fab{display:none}
+  .refresh-head{display:grid;place-items:center;width:38px;height:38px;flex-shrink:0;border-radius:50%;border:1px solid var(--line);background:transparent;color:var(--muted);cursor:pointer;padding:0}
+  .refresh-head svg{width:18px;height:18px}
+  .refresh-head.spinning svg{animation:rotate .7s linear infinite}
+}
+/* v4.6b: phone header fits at every width */
+@media (max-width:420px){
+  .site-header .header-actions{gap:6px}
+  .refresh-head{width:34px;height:34px}.refresh-head svg{width:16px;height:16px}
+  .menu-button{width:40px;height:40px}
+  .site-header .bar{gap:6px;padding-left:16px}
+  .cmi-header .brand-words strong{font-size:9.5px;letter-spacing:.03em}
+  .cmi-header .brand .mark:not(.bc){height:34px}
+  .cmi-header .brand{gap:6px;min-width:0}
+}
+@media (max-width:360px){
+  .horizon{padding:3px;min-height:36px}
+  .brand-name em{font-size:18px}.brand-name span{font-size:16px}
+  .brand .mark.bc{height:28px}
+  .cmi-header .brand-words strong{font-size:8.5px}
+  .cmi-header .brand-words small{display:none}
+}
+@media (max-width:360px){
+  .horizon-track{width:52px}
+  [data-mode='night'] .horizon-orb{transform:translateX(22px)}
+  .cmi-header .brand .mark:not(.bc){height:30px}
+  .cmi-header .brand-words strong{font-size:8px;letter-spacing:.02em}
+  .site-header .bar{padding-left:12px;padding-right:6px}
+}
+/* decorative rings and rays never push the page sideways */
+.page-hero.with-aside,.hero{overflow-x:clip}
+/* the floating refresh button only where there is a free margin beside the page; otherwise it sits in the header */
+@media (max-width:1319px){
+  .refresh-fab{display:none}
+  .refresh-head{display:grid;place-items:center;width:38px;height:38px;flex-shrink:0;border-radius:50%;border:1px solid var(--line);background:transparent;color:var(--muted);cursor:pointer;padding:0}
+  .refresh-head svg{width:18px;height:18px}
+  .refresh-head.spinning svg{animation:rotate .7s linear infinite}
+}
+@media (max-width:420px){.refresh-head{width:34px;height:34px}.refresh-head svg{width:16px;height:16px}}
+/* menu items never break onto two lines; in the narrower desktop range the toggle drops its word and the CMI menu tightens */
+.nav-item{white-space:nowrap}
+@media (min-width:921px) and (max-width:1199px){
+  .horizon-label{display:none}
+  .nav-item{padding:10px 10px}
+  .cmi-header .bc-link span:not(.mark-float){display:none}
+}
+@media (max-width:1100px){
+  .cmi-header .primary-nav{display:none}
+  .cmi-header .menu-button{display:flex}
+  .cmi-header .header-actions{margin-left:auto}
+}

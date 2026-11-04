@@ -236,7 +236,7 @@ def header(r, section):
 <header class="site-header"><div class="container"><div class="bar">
 <a class="brand" href="{r or './'}" aria-label="Believers Country — home">{mark(still=True)}<span class="brand-name"><em>Believers</em><span>Country</span></span></a>
 <nav class="primary-nav" aria-label="Main">{''.join(top)}</nav>
-<div class="header-actions">{toggle()}<a class="button gold join" href="{r}encounters/">Join us {I['arrow']}</a>
+<div class="header-actions"><button class="refresh-head" type="button" data-refresh aria-label="Refresh the page and load the latest version" title="Refresh">{I['cookie']}</button>{toggle()}<a class="button gold join" href="{r}encounters/">Join us {I['arrow']}</a>
 <button class="menu-button" id="menu-button" type="button" aria-expanded="false" aria-controls="drawer" aria-label="Open menu"><i></i><i></i></button></div>
 </div></div></header>
 <div class="drawer" id="drawer" hidden><nav aria-label="Menu">{''.join(drawer)}</nav><div class="drawer-share">{share_app(r, 'button gold', 'Share the 2 Minutes app')}</div></div>'''
@@ -249,7 +249,7 @@ def cmi_header(r):
 <header class="site-header cmi-header"><div class="container"><div class="bar">
 <a class="brand" href="#top" aria-label="Country Ministries International">{cmi_mark(still=True)}<span class="brand-words"><strong><span>Country Ministries</span><span>International</span></strong><small>CMI</small></span></a>
 <nav class="primary-nav" aria-label="On this page">{top}{home}</nav>
-<div class="header-actions">{toggle()}<a class="button gold join" href="#partner">Partner {I['arrow']}</a>
+<div class="header-actions"><button class="refresh-head" type="button" data-refresh aria-label="Refresh the page and load the latest version" title="Refresh">{I['cookie']}</button>{toggle()}<a class="button gold join" href="#partner">Partner {I['arrow']}</a>
 <button class="menu-button" id="menu-button" type="button" aria-expanded="false" aria-controls="drawer" aria-label="Open menu"><i></i><i></i></button></div>
 </div></div></header>
 <div class="drawer" id="drawer" hidden><nav aria-label="On this page">{drawer}<a class="d-link" href="{r or './'}">Believers Country <small>Home</small></a></nav></div>'''
@@ -429,7 +429,7 @@ def player(r, ep, today=False, feature=False, tools=True):
         skip = ('<button class="chip" type="button" data-skip="-15" aria-label="Back 15 seconds">↺ 15s</button><button class="chip" type="button" data-skip="30" aria-label="Forward 30 seconds">30s ↻</button>'
                 if ep['seconds'] > 600 else '')
         t = (f'<div class="player-tools">{skip}<a class="chip" data-download href="{r}{ep["audio"]}" download="{ep["slug"]}.mp3">{I["download"]} MP3</a>'
-             f'{share_box(ep["title"], r + ep["path"], text="Listen: " + ep["title"] + (" · 2 Minutes · Believers Country" if ep["seconds"] <= 600 else " · Shabbat service · Believers Country"), audio=(r + ep["audio"]) if ep["seconds"] <= 600 else "")}</div>')
+             f'{share_box(ep["title"], r + ep["path"], text="Listen: " + ep["title"] + (" · 2 Minutes · Believers Country" if ep["seconds"] <= 600 else " · Shabbat service · Believers Country"), audio=(r + ep["audio"]) if ep["seconds"] <= 600 else "", label="Share audio" if ep["seconds"] <= 600 else "Share")}</div>')
     return (f'<div class="player{" feature" if feature else ""}" {attrs}data-src="{r}{ep["audio"]}" data-duration="{ep["seconds"]}" data-album="{'Shabbat Services 5787' if ep['seconds'] > 600 else '2 Minutes Podcast'}">'
             f'<button class="play" type="button" aria-label="Play {e(ep["title"])}">{I["play"]}{I["pause"]}</button>'
             f'<div class="player-body"><div class="player-title">{e(ep["title"])}</div><div class="bars" aria-hidden="true"></div>'
@@ -1092,8 +1092,8 @@ def episode_cards():
             t = e(ep['title']); size = 92 if len(ep['title']) < 22 else 78 if len(ep['title']) < 30 else 64
             html = f'''<html><head><style>{fonts}
 *{{margin:0;box-sizing:border-box}}body{{width:1200px;height:630px;overflow:hidden;background:radial-gradient(120% 90% at 85% 20%,#1c2f57 0%,#0c1630 55%,#070d1e 100%);color:#f6efe0;font-family:MR,sans-serif;position:relative}}
-.glow{{position:absolute;right:120px;top:90px;width:420px;height:420px;border-radius:50%;background:radial-gradient(closest-side,rgba(242,183,60,.30),transparent)}}
-.mark{{position:absolute;right:190px;top:110px;height:400px}}.mark svg{{height:100%;width:auto}}
+.glow{{position:absolute;left:50%;top:66px;transform:translateX(-50%);width:440px;height:440px;border-radius:50%;background:radial-gradient(closest-side,rgba(242,183,60,.30),transparent)}}
+.mark{{position:absolute;left:50%;top:96px;transform:translateX(-50%);height:380px;width:380px}}.mark-col{{position:absolute;left:770px;width:300px;top:0;bottom:0}}.mark svg{{height:100%;width:auto}}
 .wrap{{position:absolute;left:84px;top:86px;width:660px}}
 .k{{font:700 20px MR;letter-spacing:.28em;color:#e6b85c;text-transform:uppercase}}
 h1{{font:700 {size}px/1.02 CG;margin:26px 0 18px;color:#fbf6ea}}
@@ -1101,10 +1101,10 @@ h1{{font:700 {size}px/1.02 CG;margin:26px 0 18px;color:#fbf6ea}}
 .wave{{display:flex;align-items:center;gap:7px;height:64px;margin:22px 0 0}}.wave i{{display:block;width:7px;border-radius:4px;background:linear-gradient(#f2d48a,#c99a3b)}}
 .pill{{position:absolute;left:84px;bottom:58px;display:flex;align-items:center;gap:16px;font:700 24px MR;color:#160f03;background:linear-gradient(100deg,#f2d48a,#c99a3b);padding:16px 30px 16px 18px;border-radius:999px}}
 .pill b{{width:44px;height:44px;border-radius:50%;background:#160f03;display:grid;place-items:center}}.pill b:after{{content:'';border-left:15px solid #f2d48a;border-top:10px solid transparent;border-bottom:10px solid transparent;margin-left:4px}}
-.site{{position:absolute;right:84px;bottom:84px;font:700 20px MR;letter-spacing:.12em;color:rgba(246,239,224,.7)}}
-</style></head><body><div class="glow"></div><div class="mark">{mark_svg}</div>
+.site{{position:absolute;left:0;right:0;bottom:64px;text-align:center;font:700 17px MR;letter-spacing:.16em;color:rgba(246,239,224,.7)}}
+</style></head><body><div class="mark-col"><div class="glow"></div><div class="mark">{mark_svg}</div><div class="site">BELIEVERSCOUNTRY.ORG</div></div>
 <div class="wrap"><div class="k">2 Minutes · Believers Country</div><h1>{t}</h1><div class="d">{ep['pretty'].replace(' · ', ', ')}</div><div class="wave">{bars}</div></div>
-<div class="pill"><b></b>Listen · {ep['label']}</div><div class="site">BELIEVERSCOUNTRY.ORG</div></body></html>'''
+<div class="pill"><b></b>Listen · {ep['label']}</div></body></html>'''
             pg.set_content(html); pg.wait_for_timeout(150)
             tmp = out / f"ep-{ep['slug']}.png"; pg.screenshot(path=str(tmp))
             Image.open(tmp).convert('RGB').save(out / f"ep-{ep['slug']}.jpg", quality=86, optimize=True, progressive=True); tmp.unlink()
