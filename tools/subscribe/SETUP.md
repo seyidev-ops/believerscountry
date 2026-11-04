@@ -17,7 +17,7 @@ emails go out from the ministry's Gmail. Nothing to pay for.
 3. Copy the **Web app URL** (it ends in `/exec`).
 
 ## 3. Connect it
-- In GitHub: repository **seyidev-ops/cmi → Settings → Secrets and variables → Actions → New repository secret**
+- In GitHub: repository **seyidev-ops/believerscountry → Settings → Secrets and variables → Actions → New repository secret**
   - `NOTIFY_URL` = the web app URL
   - `NOTIFY_TOKEN` = the token from step 1
 - In `tools/build_site.py`, set `SUBSCRIBE_URL` to the same web app URL and rebuild (or send the URL to Claude).

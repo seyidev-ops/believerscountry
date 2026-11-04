@@ -482,7 +482,7 @@
     const btn = $('button[type=submit]', subForm); btn.disabled = true;
     if (!endpoint) {                                                       // service not connected yet: send the request by email
       location.href = 'mailto:' + subForm.dataset.fallback + '?subject=' + encodeURIComponent('Subscribe me to the 2 Minutes Podcast') + '&body=' + encodeURIComponent('Please add me to the 2 Minutes email list.\n\nName: ' + name + '\nEmail: ' + email);
-      say(msg, 'Your email app is opening with the request. Press send to finish.'); btn.disabled = false; return;
+      say(msg, 'Your email app should open with the request: press send to finish. If nothing opened, email ' + subForm.dataset.fallback + ' with the word Subscribe and we will add you.'); btn.disabled = false; return;
     }
     say(msg, 'Subscribing…');
     try {
