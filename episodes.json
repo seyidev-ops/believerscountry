@@ -1,5 +1,16 @@
 [
  {
+  "slug": "shabbat-intermission",
+  "title": "Shabbat Intermission",
+  "date": "2026-11-07",
+  "seconds": 107,
+  "label": "1:47",
+  "blurb": "A short Sabbath word from Believers Country: a pause to rest in the Son. Press play, then carry it with you through the day.",
+  "path": "listen/2-minutes/shabbat-intermission/",
+  "audio": "assets/audio/shabbat-intermission.mp3",
+  "url": "https://believerscountry.org/listen/2-minutes/shabbat-intermission/"
+ },
+ {
   "slug": "you-are-a-bible-character",
   "title": "You Are a Bible Character",
   "date": "2026-11-06",
