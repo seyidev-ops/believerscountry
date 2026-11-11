@@ -1,5 +1,16 @@
 [
  {
+  "slug": "tradition-of-remembering",
+  "title": "The Tradition of Remembering",
+  "date": "2026-11-12",
+  "seconds": 95,
+  "label": "1:35",
+  "blurb": "A short word from Believers Country on the tradition of remembering. Press play, then carry it with you through the day.",
+  "path": "listen/2-minutes/tradition-of-remembering/",
+  "audio": "assets/audio/tradition-of-remembering.mp3",
+  "url": "https://believerscountry.org/listen/2-minutes/tradition-of-remembering/"
+ },
+ {
   "slug": "of-none-effect-finale",
   "title": "Of None Effect (Finale)",
   "date": "2026-11-11",
