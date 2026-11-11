@@ -1,5 +1,16 @@
 [
  {
+  "slug": "remember-my-bonds",
+  "title": "Remember My Bonds",
+  "date": "2026-11-14",
+  "seconds": 92,
+  "label": "1:32",
+  "blurb": "The next word in the short series from Believers Country: remembering the bonds. Press play, then carry it with you through the day.",
+  "path": "listen/2-minutes/remember-my-bonds/",
+  "audio": "assets/audio/remember-my-bonds.mp3",
+  "url": "https://believerscountry.org/listen/2-minutes/remember-my-bonds/"
+ },
+ {
   "slug": "remember-the-poor",
   "title": "Remember the Poor",
   "date": "2026-11-13",
