@@ -57,6 +57,8 @@ for s in SERVICES:
     s['iso'] = dt.datetime.strptime(s['date'], '%d %B %Y').date().isoformat()
 
 EPISODES = [
+    dict(slug='remember-the-word', title='Remember the Word', date='2026-11-15', seconds=110, label='1:50',
+         word='Remember the word', blurb='The closing word of the short series from Believers Country: remembering the word. Press play, then carry it with you through the day.'),
     dict(slug='remember-my-bonds', title='Remember My Bonds', date='2026-11-14', seconds=92, label='1:32',
          word='Remember my bonds', blurb='The next word in the short series from Believers Country: remembering the bonds. Press play, then carry it with you through the day.'),
     dict(slug='remember-the-poor', title='Remember the Poor', date='2026-11-13', seconds=117, label='1:57',
@@ -455,7 +457,7 @@ def player(r, ep, today=False, feature=False, tools=True):
             f'<div class="player-time"><span class="t-cur">0:00</span><span class="t-total">{ep["label"]}</span></div>{t}</div></div>')
 
 def ep_card(r, ep):
-    ax = {'remember-my-bonds': '30%', 'remember-the-poor': '65%', 'tradition-of-remembering': '45%', 'of-none-effect-finale': '70%', 'of-none-effect-part-3': '20%', 'of-none-effect-part-2': '55%', 'of-none-effect-part-1': '35%', 'shabbat-intermission': '50%', 'you-are-a-bible-character': '25%', 'the-lord-is-that-spirit': '60%', 'into-the-same-image': '40%', 'you-are-the-glory-of-god': '75%', 'we-speak-wisdom': '55%', 'for-your-glory': '20%', 'the-life-of-god-part-4': '30%', 'the-life-of-god-part-3': '70%', 'the-life-of-god-part-2': '45%', 'the-life-of-god-part-1': '15%', 'grace-is-not-works': '80%', 'what-is-grace': '50%', 'son-talk-part-2': '30%', 'son-talk-part-1': '65%', 'who-are-believers': '40%', 'believe-on-him-part-3': '75%', 'how-believe-comes': '20%', 'believing-on-him-part-2': '55%', 'believe-on-him-part-1': '35%', 'the-measuring-line': '60%', 'no-separation': '25%', 'proof-that-you-know-god': '70%', 'what-is-your-advantage-as-a-believer': '45%', 'relationship-with-the-father': '80%'}[ep['slug']]
+    ax = {'remember-the-word': '80%', 'remember-my-bonds': '30%', 'remember-the-poor': '65%', 'tradition-of-remembering': '45%', 'of-none-effect-finale': '70%', 'of-none-effect-part-3': '20%', 'of-none-effect-part-2': '55%', 'of-none-effect-part-1': '35%', 'shabbat-intermission': '50%', 'you-are-a-bible-character': '25%', 'the-lord-is-that-spirit': '60%', 'into-the-same-image': '40%', 'you-are-the-glory-of-god': '75%', 'we-speak-wisdom': '55%', 'for-your-glory': '20%', 'the-life-of-god-part-4': '30%', 'the-life-of-god-part-3': '70%', 'the-life-of-god-part-2': '45%', 'the-life-of-god-part-1': '15%', 'grace-is-not-works': '80%', 'what-is-grace': '50%', 'son-talk-part-2': '30%', 'son-talk-part-1': '65%', 'who-are-believers': '40%', 'believe-on-him-part-3': '75%', 'how-believe-comes': '20%', 'believing-on-him-part-2': '55%', 'believe-on-him-part-1': '35%', 'the-measuring-line': '60%', 'no-separation': '25%', 'proof-that-you-know-god': '70%', 'what-is-your-advantage-as-a-believer': '45%', 'relationship-with-the-father': '80%'}[ep['slug']]
     return f'''<article class="card ep" style="--ax:{ax}"><div class="art" aria-hidden="true"><span class="rings"></span><span class="art-dur">{ep['label']}</span><span class="art-word">{e(ep['word'])}</span></div>
 <div class="kicker">{ep['pretty']} <span class="badge latest" data-today-flag="{ep['slug']}" hidden>Today</span></div>
 <h3><a class="card-link" href="{r}{ep['path']}">{e(ep['title'])}</a></h3><p>{e(ep['blurb'])}</p>{player(r, ep)}</article>'''
