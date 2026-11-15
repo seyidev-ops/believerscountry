@@ -1,5 +1,49 @@
 [
  {
+  "slug": "the-peace-of-god-part-4",
+  "title": "The Peace of God (Part 4)",
+  "date": "2026-11-19",
+  "seconds": 111,
+  "label": "1:51",
+  "blurb": "The fourth word in the series from Believers Country on the peace of God. Press play, then carry it with you through the day.",
+  "path": "listen/2-minutes/the-peace-of-god-part-4/",
+  "audio": "assets/audio/the-peace-of-god-part-4.mp3",
+  "url": "https://believerscountry.org/listen/2-minutes/the-peace-of-god-part-4/"
+ },
+ {
+  "slug": "the-peace-of-god-part-3",
+  "title": "The Peace of God (Part 3)",
+  "date": "2026-11-18",
+  "seconds": 110,
+  "label": "1:50",
+  "blurb": "The third word in the series from Believers Country on the peace of God. Press play, then carry it with you through the day.",
+  "path": "listen/2-minutes/the-peace-of-god-part-3/",
+  "audio": "assets/audio/the-peace-of-god-part-3.mp3",
+  "url": "https://believerscountry.org/listen/2-minutes/the-peace-of-god-part-3/"
+ },
+ {
+  "slug": "the-peace-of-god-part-2",
+  "title": "The Peace of God (Part 2)",
+  "date": "2026-11-17",
+  "seconds": 109,
+  "label": "1:49",
+  "blurb": "The second word in the series from Believers Country on the peace of God. Press play, then carry it with you through the day.",
+  "path": "listen/2-minutes/the-peace-of-god-part-2/",
+  "audio": "assets/audio/the-peace-of-god-part-2.mp3",
+  "url": "https://believerscountry.org/listen/2-minutes/the-peace-of-god-part-2/"
+ },
+ {
+  "slug": "the-peace-of-god-part-1",
+  "title": "The Peace of God (Part 1)",
+  "date": "2026-11-16",
+  "seconds": 93,
+  "label": "1:33",
+  "blurb": "The first word in a short series from Believers Country on the peace of God. Press play, then carry it with you through the day.",
+  "path": "listen/2-minutes/the-peace-of-god-part-1/",
+  "audio": "assets/audio/the-peace-of-god-part-1.mp3",
+  "url": "https://believerscountry.org/listen/2-minutes/the-peace-of-god-part-1/"
+ },
+ {
   "slug": "remember-the-word",
   "title": "Remember the Word",
   "date": "2026-11-15",
