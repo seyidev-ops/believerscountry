@@ -1115,7 +1115,16 @@ def episode_cards():
     mark_svg = favicon_svg('#f6efe0')
     bars = ''.join(f'<i style="height:{h}px"></i>' for h in [14, 26, 40, 24, 50, 32, 60, 44, 28, 54, 36, 20, 46, 30, 58, 34, 18, 42, 24, 52, 30, 16, 36, 22])
     with sync_playwright() as p:
-        b = p.chromium.launch(); pg = b.new_page(viewport={'width': 1200, 'height': 630})
+        import glob
+        b = None
+        for exe in [None] + sorted(glob.glob('/opt/pw-browsers/chromium_headless_shell-*/*/chrome-headless-shell')):
+            try:
+                b = p.chromium.launch(executable_path=exe) if exe else p.chromium.launch(); break
+            except Exception as err:
+                last = err
+        if b is None:
+            print('episode cards skipped:', str(last).splitlines()[0]); return
+        pg = b.new_page(viewport={'width': 1200, 'height': 630})
         for ep in todo:
             t = e(ep['title']); size = 92 if len(ep['title']) < 22 else 78 if len(ep['title']) < 30 else 64
             html = f'''<html><head><style>{fonts}
