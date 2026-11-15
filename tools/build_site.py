@@ -606,12 +606,12 @@ def home(r):
 <div class="grid g3 reveal-stagger">{enc}</div></div></section>
 
 <section class="section"><div class="container">
-<div class="section-head reveal"><div><div class="eyebrow">Shabbat teachings · First quarter 5787</div><h2>Celebrating <em>the Son.</em></h2><p class="lead">Thirteen Sabbaths moving through the person and work of Christ — from His place before all things to the promise of His return. Read them, or listen to the full services on the go.</p></div><div style="display:flex;gap:10px;flex-wrap:wrap"><a class="button ghost" href="{r}listen/2-minutes/#shabbat">{I['headphones']} Listen to the services</a><a class="textlink" href="{r}teachings/">The full library <span class="arr">→</span></a></div></div>
+<div class="section-head reveal"><div><div class="eyebrow">Shabbat teachings · First quarter 5787</div><h2>Celebrating <em>the Son.</em></h2><p class="lead">Thirteen Sabbaths moving through the person and work of Christ — from His place before all things to the promise of His return. Read them, or listen to the full services on the go.</p></div><div style="display:flex;gap:10px;flex-wrap:wrap"><a class="button ghost" href="{r}teachings/#shabbat">{I['headphones']} Listen to the services</a><a class="textlink" href="{r}teachings/">The full library <span class="arr">→</span></a></div></div>
 <div class="teach-grid reveal-stagger">{''.join(svc_card(r, s, i == 0) for i, s in enumerate(feat))}</div></div></section>
 
 <section class="section tight"><div class="container grid g2">
 <article class="card reveal" style="padding:clamp(26px,3vw,42px)"><div class="kicker">The listening room</div><h2 style="margin:10px 0 14px">2 Minutes <em>Podcast.</em></h2><p>Short, original words from Believers Country. Press play, then sit with it for the rest of your day.</p>
-<div style="display:grid;gap:10px;margin:16px 0">{''.join(f'<a class="chip" style="justify-content:space-between;padding:12px 16px;position:relative;z-index:2" href="{r}{x["path"]}"><span>{e(x["title"])}</span><span class="muted">{x["label"]}</span></a>' for x in EPISODES)}</div>
+<p class="muted" style="margin:0 0 20px">A new word every evening at 6 PM. Every episode so far is waiting in the listening room.</p>
 <a class="button primary" style="position:relative;z-index:2;align-self:flex-start" href="{r}listen/2-minutes/">{I['headphones']} Enter the listening room</a></article>
 <article class="card reveal" style="padding:clamp(26px,3vw,42px)"><div class="kicker">Books · Spiritual Intent</div><h2 style="margin:10px 0 14px">Money <em>Under God.</em></h2><p>Scripture read in the light of Christ — four books on wealth, receiving, debt, investment and enjoyment.</p>
 <div class="books" style="margin:22px 0;grid-template-columns:repeat(4,1fr)">{''.join(f'<span class="book"><img src="{r}assets/books/money-under-god/{b}.png" alt="" width="256" height="405" loading="lazy" decoding="async"></span>' for b in ['scriptural-wealth', 'how-to-receive-from-god', 'scriptural-pattern-of-debt', 'investment-and-enjoyment'])}</div>
@@ -821,21 +821,19 @@ def subscribe_section(r):
 
 def listen(r):
     ep = episode_for(SACRED)
-    rows = [archive_row(r, x, 'podcast') for x in EPISODES] + [archive_row(r, x, 'shabbat') for x in SERVICES if x.get('audio')]
-    n_pod, n_sab = len(EPISODES), len([x for x in SERVICES if x.get('audio')])
+    rows = [archive_row(r, x, 'podcast') for x in EPISODES]
     return page_hero(r, [(None, 'Listen')], 'The listening room', '2 Minutes <em>Podcast.</em>',
-                     'A brief word, with room to reflect — and the full Shabbat services for the road. Play here, download for later, or share with someone who needs it today.', side=False) + f'''
+                     'A brief word, with room to reflect. Play here, download for later, or share with someone who needs it today.', side=False) + f'''
 <section class="section tight" style="padding-top:0"><div class="container"><div class="panel feature-player reveal" data-today-wrap>
 <div class="today-label"><span class="live-dot"></span> Today’s 2 minutes · <span data-hcivil></span></div>{player(r, ep, today=True, feature=True)}
 <p class="muted small" style="margin:14px 0 0">A new day begins at 6:00 PM, and so does the day’s word. <a class="textlink" data-today-link href="{r}{ep['path']}">Episode page <span class="arr">→</span></a></p></div></div></section>
 {subscribe_section(r)}
-<section class="section tight" id="archive"><span id="shabbat"></span><div class="container"><div class="section-head reveal"><div><h2>The <em>archive.</em></h2><p class="lead">Every recording in one place. Search by title or topic, filter by kind, and sort by date.</p></div>
+<section class="section tight" id="archive"><div class="container"><div class="section-head reveal"><div><h2>The <em>archive.</em></h2><p class="lead">Every 2 Minutes word in one place. Search by title or topic, and sort by date. The full Shabbat services are with the <a class="textlink" href="{r}teachings/#shabbat">Shabbat teachings</a>.</p></div>
 <a class="button ghost" href="{LINKS['youtube']}" target="_blank" rel="noopener">{I['youtube']} More on YouTube</a></div>
-<div class="filters reveal" data-arc-tools><label class="sr-only" for="arc-q">Search recordings</label><input id="arc-q" type="search" placeholder="Search a title, topic or scripture…" data-arc-search>
-<button class="chip" type="button" data-arc-kind="all" aria-pressed="true">All {n_pod + n_sab}</button><button class="chip" type="button" data-arc-kind="podcast" aria-pressed="false">2 Minutes · {n_pod}</button><button class="chip" type="button" data-arc-kind="shabbat" aria-pressed="false">Shabbat services · {n_sab}</button>
+<div class="filters reveal" data-arc-tools><label class="sr-only" for="arc-q">Search recordings</label><input id="arc-q" type="search" placeholder="Search a title or topic…" data-arc-search>
 <label class="sr-only" for="arc-sort">Sort recordings</label><select id="arc-sort" class="chip sort" data-arc-sort><option value="new">Newest first</option><option value="old">Oldest first</option><option value="az">Title A–Z</option></select></div>
 <p class="muted small" data-arc-count aria-live="polite"></p>
-<div class="arc-list" data-arc-list>{''.join(rows)}</div><p class="empty" data-arc-empty hidden>No recording matches that search.</p></div></section>
+<div class="arc-list" data-arc-list>{''.join(rows)}</div><p class="empty" data-arc-empty hidden>No episode matches that search.</p></div></section>
 {next_steps(r, [('teachings/', 'Shabbat teachings', 'Read the services Sabbath by Sabbath.'), ('spiritual-intent/', 'Spiritual Intent', 'Books for careful, Christ-centred study.'), ('encounters/', 'Gather with us', 'Three weekly encounters.')])}'''
 
 def shabbat_audio(r):
@@ -845,7 +843,7 @@ def shabbat_audio(r):
     rows = ''.join(f'''<article class="card svc-row"><div class="svc-meta"><div class="kicker">Shabbat {x['n']} · {dt.date.fromisoformat(x['iso']).strftime('%-d %B %Y')}</div>
 <h3><a class="card-link" href="{r}teachings/{x['slug']}/">{e(x['title'])}</a></h3><div class="focus">{e(x['focus'])}</div></div>{player(r, x)}</article>''' for x in rec)
     return f'''<section class="section tight" id="shabbat"><div class="container"><div class="section-head reveal"><div><div class="eyebrow">Shabbat services · audio</div><h2>Take the Sabbath <em>with you.</em></h2>
-<p class="lead">Full Shabbat services celebrating the Son. Listen on the way, at work or at rest — each one also opens as a written teaching.</p></div><a class="textlink" href="{r}teachings/">The teaching library <span class="arr">→</span></a></div>
+<p class="lead">Full Shabbat services celebrating the Son. Listen on the way, at work or at rest — each one also opens as a written teaching.</p></div><a class="textlink" href="#all">All thirteen teachings <span class="arr">↑</span></a></div>
 <div class="grid reveal-stagger">{rows}</div></div></section>'''
 
 def episode_page(ep, idx):
@@ -901,6 +899,7 @@ def teachings(r):
 <div class="filters reveal"><label class="sr-only" for="teach-q">Search teachings</label><input id="teach-q" type="search" placeholder="Search a title, theme or scripture…" data-teach-search>
 <button class="chip" type="button" data-filter="all" aria-pressed="true">All 13</button><button class="chip" type="button" data-filter="shared" aria-pressed="false">Shared</button><button class="chip" type="button" data-filter="upcoming" aria-pressed="false">Coming</button></div>
 <div class="teach-grid reveal-stagger">{cards}</div><p class="empty" data-empty hidden>No teaching matches that search.</p></div></section>
+{shabbat_audio(r)}
 {next_steps(r, [('encounters/shabbat-service/', 'Join Shabbat', 'Saturdays at 8:00 AM WAT.'), ('listen/2-minutes/', '2 Minutes Podcast', 'A short word for every day.'), ('year-5787/', 'The Year 5787', 'Tav, Shin, Pe, Zayin.')])}'''
 
 def teaching_page(s, idx):

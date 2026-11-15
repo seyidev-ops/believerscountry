@@ -345,19 +345,20 @@
   const arcList = $('[data-arc-list]');
   if (arcList) {
     const rows = $$('[data-arc]', arcList), q = $('[data-arc-search]'), sortSel = $('[data-arc-sort]'), kinds = $$('[data-arc-kind]'), count = $('[data-arc-count]'), empty = $('[data-arc-empty]');
-    let kind = location.hash === '#shabbat' ? 'shabbat' : 'all';
+    const toServices = () => { if (location.hash === '#shabbat') location.replace(ROOT + 'teachings/#shabbat'); };   // the services now live with the teachings
+    toServices(); addEventListener('hashchange', toServices);
+    let kind = 'all';
     const run = () => {
       const term = q.value.toLowerCase().trim(), mode = sortSel.value;
       const sorted = [...rows].sort((a, b) => mode === 'az' ? a.dataset.title.localeCompare(b.dataset.title) : mode === 'old' ? a.dataset.date.localeCompare(b.dataset.date) : b.dataset.date.localeCompare(a.dataset.date));
       let shown = 0;
       sorted.forEach(r => { arcList.appendChild(r); const ok = (kind === 'all' || r.dataset.kind === kind) && (!term || r.textContent.toLowerCase().includes(term)); r.hidden = !ok; if (ok) shown++; });
       kinds.forEach(c => c.setAttribute('aria-pressed', String(c.dataset.arcKind === kind)));
-      if (count) count.textContent = shown + (shown === 1 ? ' recording' : ' recordings');
+      if (count) count.textContent = shown + (shown === 1 ? ' episode' : ' episodes');
       if (empty) empty.hidden = !!shown;
     };
     q.addEventListener('input', run); sortSel.addEventListener('change', run);
     kinds.forEach(c => c.addEventListener('click', () => { kind = c.dataset.arcKind; run(); }));
-    addEventListener('hashchange', () => { if (location.hash === '#shabbat') { kind = 'shabbat'; run(); } });
     run();
   }
 
