@@ -193,10 +193,9 @@
     const iso = new Date(d.day).toISOString().slice(0, 10);
     const exact = EPISODES.find(e => e.date === iso);
     if (exact) return exact;
-    const asc = [...EPISODES].sort((a, b) => a.date.localeCompare(b.date));
-    const first = Date.parse(asc[0].date + 'T00:00:00Z');
-    const idx = ((Math.round((d.day - first) / DAY) % asc.length) + asc.length) % asc.length;
-    return asc[idx];
+    // No word for this day yet (it is published a few minutes after 6 PM): keep the latest one already out.
+    const past = EPISODES.filter(e => e.date <= iso).sort((a, b) => b.date.localeCompare(a.date));
+    return past[0] || [...EPISODES].sort((a, b) => a.date.localeCompare(b.date))[0];
   }
   const todayEp = episodeFor(today);
   $$('[data-today-player]').forEach(p => {

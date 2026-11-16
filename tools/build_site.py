@@ -143,8 +143,8 @@ def episode_for(day):
     for ep in asc:
         if ep['date'] == day.isoformat():
             return ep
-    first = dt.date.fromisoformat(asc[0]['date'])
-    return asc[(day - first).days % len(asc)]
+    past = [ep for ep in asc if ep['date'] <= day.isoformat()]
+    return past[-1] if past else asc[0]
 
 # ------------------------------------------------------------------ icons
 I = {
